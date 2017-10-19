@@ -11,6 +11,17 @@ import cern.jet.random.Uniform;
  */
 public class PlantCalculator {
 
+	
+	
+	//================================================================================
+	//
+    // The following methods are from the ForClim Cohort submodel
+	// C# source: Cohort.cs 
+    //
+	// ================================================================================
+
+	
+	
 	/** Calculate the initial height of the cohort
 	 * 
 	 * Cohort.cs Cohort() lines 139, 184, 247
@@ -254,7 +265,8 @@ public class PlantCalculator {
 	 * @param kA2 allometric foliage weight parameter
 	 * @return gFolW foliage weight in kg of a single tree in the cohort
 	 */
-	public static double foliageWeight(double dbh, double kC1, double gA1, double kA2){return kC1 * gA1 * Math.pow(dbh, kA2);} 
+	public static double foliageWeight(double dbh, double kC1, double gA1, double kA2){
+		return kC1 * gA1 * Math.pow(dbh, kA2);} 
 
 	/** Sum of the volumes of an individual tree <br>
 	 *  Calculated with the Denzin formula. <br>
@@ -325,7 +337,7 @@ public class PlantCalculator {
 	 * 
 	 * Cohort.cs methods StandBiomass() and BranchesBiomass() lines 568 - 581, 596 - 609
 	 * 
-	 * TODO it is problematic that these values are hard coded.  They should be parameters.
+	 * TODO it is highly problematic that these values are hard coded.  They should be parameters.
 	 * Move to the plant species class.
 	 * 
 	 * @param kType whether the species is evergreen or deciduous
@@ -342,7 +354,6 @@ public class PlantCalculator {
                     bef = 1.4;
                     cdf = 0.48;
 		}
-		
 		return bef * cdf;
 	}
 	
@@ -400,7 +411,6 @@ public class PlantCalculator {
 		return foliageWeight(dbh, kC2, gA1, kA2);
 	} 
 	
-	
 	/** The foliage litter (TODO is this the weight?) for an entire cohort <br>
 	 * 
 	 *  Cohort.cs method FoliageLitter() lines 694 - 696
@@ -429,6 +439,103 @@ public class PlantCalculator {
 				(double)deadTreeCount);
 	}
 	
+	/** Calculate the twig litter of a single tree. <br>
+	 * 
+	 * Cohort.cs method TwigLitter line 710.<br>
+	 * 
+	 * Note: the C# code calculated for a whole cohort, this is for a single tree.
+	 * @param dbh current dbh of trees in the cohort.
+	 * @param kConv Conversion factor basal area-twig litter
+	 * @param kAshFree Proportion of organic matter content of dry weight Plant.cs
+	 * @return amount of twig litter for a tree TODO: What are the units?
+	 */
+	public static double twigLitter(double dbh, double kConv, double kAshFree){
+		/* (Math.PI / 4d) is 0.7853982 */
+		return 0.7853982 * dbh * dbh * kConv * kAshFree;
+	}
+	
+	/** Calculate the root litter output of a single tree <br>
+	 * 
+	 * Cohort.cs method RootLitter Lines 726 - 728<br>
+	 * 
+	 * Note: The C# code calculates the root litter for a cohort.
+	 * 
+	 * @param kC1 Dry to wet weight ratio of foliage. Species.cs
+	 * @param gA1 Current value of parameter for the allometric relationship between dbh and foliage weight. Cohort.cs
+	 * @param dbh Current dbh of the tree Cohort.cs
+	 * @param kA2 Allometric parameter for foliage weight Species.cs
+	 * @param kRSR Root:shoot ratio of litter production Plant.cs
+	 * @param kAshFree Organic matter proportion of dry foliage weight Plant.cs
+	 * @return mass of root litter per tree
+	 */
+	public static double RootLitterPerTree(
+			double kC1, double gA1, double dbh, 
+			double kA2,	double kRSR, double kAshFree)
+	{
+		double foliageTotalDryWeightPerTree = foliageWeight(dbh, kC1, gA1, kA2);
+		double foliageOrganicWeightPerTree = foliageTotalDryWeightPerTree * kAshFree;
+		return kRSR * foliageTotalDryWeightPerTree;
+	}
+	
+	/** Calculate the root litter output of an entire cohort <br>
+	 * 
+	 * Cohort.cs method RootLitter Lines 726 - 728<br>
+	 * 
+	 * Note: The C# code calculates the root litter for a cohort.
+	 * 
+	 * @param kC1 Dry to wet weight ratio of foliage. Species.cs
+	 * @param gA1 Current value of parameter for the allometric relationship between dbh and foliage weight. Cohort.cs
+	 * @param dbh Current dbh of the tree Cohort.cs
+	 * @param kA2 Allometric parameter for foliage weight Species.cs
+	 * @param kRSR Root:shoot ratio of litter production Plant.cs
+	 * @param kAshFree Organic matter proportion of dry foliage weight Plant.cs
+	 * @param countLiveTrees number of living trees Cohort.cs
+	 * @param countDeadTrees number of dead trees Cohort.cs  TODO:  Are these trees that died this time step or cumulative?
+	 * @param kFRT Average time of foliage retention Species.cs
+	 * @return mass of root litter per cohort TODO: units?
+	 */
+	public static double RootLitterPerCohort(
+			double kC1, double gA1, double dbh, 
+			double kA2,	double kRSR, double kAshFree,
+			int countLiveTrees, int countDeadTrees, double kFRT)
+	{
+		double rootLitterPerTree = RootLitterPerTree(kC1, gA1, dbh, kA2, kRSR, kAshFree);
+		return rootLitterPerTree * ((double)countDeadTrees + (double)countLiveTrees / kFRT);
+	}
+	
+	/** Calculate the stemwood biomass of a single tree. <br>
+	 * 
+	 * Cohort.cs method WoodyLitter line 743<br>
+	 * 
+	 * TODO The C# code does not provide the source of this equation...
+	 * 
+	 * @param dbh The tree's current DBH
+	 * @return
+	 */
+	public static double stemwoodTree(double dbh){
+		return 0.12 * Math.pow(dbh, 2.4);
+	}
+	
+	/** Calculate the woody litter produced by a dead tree.<br>
+	 * 
+	 * Cohort.cs method WoodyLitter line 744 <br>
+	 * 
+	 * @param dbh The tree's current DBH
+	 * @param kAshFree Organic matter proportion of dry foliage weight Plant.cs
+	 * @return
+	 */
+	public static double woodyLitter(double dbh, double kAshFree){
+		return stemwoodTree(dbh) * kAshFree;
+	}
+	
+	
+	//================================================================================
+	//
+    // The following methods are from the ForClim Plant class
+	// C# source: Plant.cs 
+    //
+	// ================================================================================
+	
 	
 	
 	/** Light availability given the leaf area above
@@ -456,6 +563,112 @@ public class PlantCalculator {
 	public static double leafAreaIndex(double gCumulativeFoliageArea, double kPatchSize){
 		return gCumulativeFoliageArea / kPatchSize;
 	}
+	
+	
+	
+	
+	//================================================================================
+	//
+    // The following methods are from the ForClim Species class
+	// C# source: Species.cs 
+    //
+	// ================================================================================
+	
+	
+	
+	/** Calculate the likelihood of browsing. <br>
+	 * 
+	 * Species.cs in method Initialize() lines 182 - 189<br>
+	 * 
+	 * TODO this is bad practice to have these values hard-coded
+	 * 
+	 * @param kBrow browsing susceptibility level
+	 * @param kBrPr Browsing pressure intensity
+	 * @return browsing probability
+	 */
+	public static double browsingProbability(int kBrow, double kBrPr){
+		double kBrPrAdj = 0.01 * kBrPr;
+		switch(kBrow) //new relationship between kBrP and kBrPr for 5 levels of kBrow [MD]
+		{
+			case 1: return Math.pow(kBrPrAdj, 4);  
+			case 2: return Math.pow(kBrPrAdj, 2);  
+			case 3: return Math.pow(kBrPrAdj, 1);  
+			case 4: return Math.pow(kBrPrAdj, 0.5); 
+			case 5: return Math.pow(kBrPrAdj, 0.25); 
+			default: return 0d;
+		}
+	}
+	
+	/** Calculate the slope of the s-change TODO find better description.
+	 * 
+	 * Species.cs Method Initialize() line 219
+	 * 
+	 * TODO find source for this equation
+	 * 
+	 * @param kLa shade tolerance of adult trees
+	 * @return value of the slope parameter
+	 */
+	public static double sChangeSlope(double kLa){
+		return 14d * kLa + 13d;
+	}
+	
+	/** Calculate the minimum value for the s-parameter.  TODO need better description
+	 * 
+	 * Species.cs method Initialize line 220
+	 * 
+	 * @param kLa shade tolerance of adult trees
+	 * @return minimum allowed value for the parameter
+	 * 
+	 * TODO find sources for these constants
+	 */
+	public static double sMinValue(double kLa){return 1.3 * kLa + 39.5;}
+	
+	
+	/** Calculate the initial value for the skininess parameter. <br>
+	 * 
+	 * Species.cs method Initialize() line 221
+	 * @param kSMin minimum value of the skininess parameter
+	 * @param kE1 slope of skininess parameter change
+	 * @return initial skininess parameter value
+	 */
+	public static double initialSkininess(double kSMin, double kE1){return kSMin + 0.75 * kE1;}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	/**
