@@ -11,17 +11,17 @@ import cern.jet.random.Uniform;
  */
 public class PlantCalculator {
 
-	
-	
+
+
 	//================================================================================
 	//
-    // The following methods are from the ForClim Cohort submodel
+	// The following methods are from the ForClim Cohort submodel
 	// C# source: Cohort.cs 
-    //
+	//
 	// ================================================================================
 
-	
-	
+
+
 	/** Calculate the initial height of the cohort
 	 * 
 	 * Cohort.cs Cohort() lines 139, 184, 247
@@ -35,7 +35,7 @@ public class PlantCalculator {
 	public static double initialHeight(double kB1, double kHMax, double kSIn, double dbh){
 		return  kB1 + (kHMax - kB1) * (1 - Math.exp(-kSIn * dbh / (kHMax - kB1)));
 	}
-	
+
 	/** Calculate the value of the A1 allometric crown geometry parameter. <br>
 	 * 
 	 * Cohort.cs Cohort() line 193, 282
@@ -50,7 +50,7 @@ public class PlantCalculator {
 			double kA1min, double kA1max, double initLAI, double lcp_La1){
 		return Math.max(kA1min, kA1max - (kA1max - kA1min) * (initLAI / lcp_La1));
 	} 
-	
+
 	/** Update the A1 allometric crown geometry parameter. <br>
 	 * 
 	 * Cohort.cs method CohortCrownGeometry() lines 279 - 286
@@ -64,15 +64,15 @@ public class PlantCalculator {
 	 */
 	public static double cohortCrownGeometry(
 			double kA1min, double kA1max, double lai, double lcp_La1, double a1){
-        double gA1;
-				
+		double gA1;
+
 		// first check that current value for kA1 does not fall below kA1min :
-        gA1 = allometricParameterA1(kA1min, kA1max, lai, lcp_La1);
-        
+		gA1 = allometricParameterA1(kA1min, kA1max, lai, lcp_La1);
+
 		// second check that current value for A1 does not increase :
 		return Math.min(gA1, a1);
 	}
-	
+
 	/** Crown length growth factor <br>
 	 * 
 	 * Cohort.cs method Grow() lines 302 - 304
@@ -92,11 +92,11 @@ public class PlantCalculator {
 	{
 		double gLCP_La = lcp_La1 - (lcp_La1 - lcp_La9) * (kLa - 1d) * 0.125;
 		double gCLGF = kCLGF_a * a1 / (kA1max - kA1min) * gLCP_La / ((lcp_La1 + lcp_La9) * 0.5);
-		
+
 		/* ensure the growth factor is between 0 and 1. */
 		return Math.min(1d, Math.max(0, gCLGF));
 	}
-	
+
 	/** Growth reduction factor <br>
 	 *  C# code says the crown length growth factor is excluded,
 	 *  but includes it in the calculation. <br>
@@ -111,7 +111,7 @@ public class PlantCalculator {
 	public static double growthReductionFactor(double gSGRF, double aglf, double gCLGF){
 		return gSGRF * Math.pow(aglf, 0.333) * Math.pow(gCLGF, 0.333);
 	}
-	
+
 	/** "Skinniness" of the tree. <br>
 	 * 
 	 *  Cohort.cs method Grow() line 310
@@ -124,7 +124,7 @@ public class PlantCalculator {
 	public static double skinnyTree(double kSMin, double kE1, double al){
 		return kSMin + kE1 * (1d - al);
 	}
-	
+
 	/** Competition parameter
 	 * 
 	 *  Cohort.cs method Grow() line 311
@@ -138,7 +138,7 @@ public class PlantCalculator {
 	public static double competitionFunctionParameter(double gS, double h, double kB1, double kHMax){
 		return Math.max(0d,  gS * (1d - (h - kB1) / (kHMax - kB1)));
 	}
-	
+
 	/** Diameter growth rate <br>
 	 * 
 	 * //TODO this is the same as one of the classic gap model equations.  Find the reference 
@@ -156,7 +156,7 @@ public class PlantCalculator {
 	public static double diameterGrowthRate(double gGRF, double kG, double dbh, double height, double kHMax, double gFun){
 		return Math.max(0, gGRF * kG * dbh * (1d - height / kHMax) / (2d *height + gFun * dbh));
 	}
-	
+
 	/** The increase in dbh for the current time step <br>
 	 * 
 	 * Cohort.cs method Grow() line 317
@@ -168,7 +168,7 @@ public class PlantCalculator {
 	public static double diameterIncrement(double timeStep, double gRateD){
 		return timeStep * gRateD;
 	}
-	
+
 	/**  The height increment for the current time step. <br>
 	 * 
 	 * Cohort.cs method Grow() line 318
@@ -180,7 +180,7 @@ public class PlantCalculator {
 	public static double heightIncrement(double dbhIncrement, double gFun){
 		return dbhIncrement * gFun;
 	}
-	
+
 	/** The tree's increase in volume for the time step. <br>
 	 * 
 	 * Cohort.cs method Grow() line 321
@@ -195,7 +195,7 @@ public class PlantCalculator {
 	public static double volumeIncrement(double dbh, double height, double dbhIncrement, double heightIncrement){
 		return 2d * dbh * height * dbhIncrement + dbh * dbh * heightIncrement;
 	}
-	
+
 	/** Update the number of years the the cohort has been in a slow growth state. <br>
 	 *  
 	 *  Cohort.cs method Grow() line 328
@@ -211,7 +211,7 @@ public class PlantCalculator {
 		if(gGRF < kMinRelInc | gRateD < kMinAbsInc) return sGr + 1;
 		else return 0;
 	}
-	
+
 	/**  The mortality rate for stressed trees <br>
 	 * 	ForClim v.3.0 equation 4.30
 	 * 
@@ -226,7 +226,7 @@ public class PlantCalculator {
 		if(sGr > kSlowGrowThreshold) return kSlowGrowMortProb;
 		else return 0d;
 	} 
-	
+
 	/**  overall annual probability that a tree dies<br>
 	 * ForClim v.3.0 equation 4.33:<br>
 	 * 
@@ -239,7 +239,7 @@ public class PlantCalculator {
 	public static double annualTreeMortalityRate(double gPDist, double gPAge, double gPStr){
 		return gPDist + (1d - gPDist) * (gPAge + (1d - gPAge) * gPStr);
 	}
-	
+
 	/** ForClim v.3.0 equation 4.12
 	 * 
 	 * Cohort.cs Light() Lines 378 - 381
@@ -250,10 +250,10 @@ public class PlantCalculator {
 	 */
 	public static double availableLightGrowthFactor(double aL, double kLa){
 		double gL1 = 1d - Math.exp(-4.64 * (aL - 0.05));
-	    double gL9 = 2.24 * (1d - Math.exp(-1.136 * (aL - 0.08)));
-	    return Math.max(0d, gL1 + (kLa - 1) * (gL9 - gL1) / 8d);
+		double gL9 = 2.24 * (1d - Math.exp(-1.136 * (aL - 0.08)));
+		return Math.max(0d, gL1 + (kLa - 1) * (gL9 - gL1) / 8d);
 	} 
-	
+
 	/** ForClim v.3.0 equation 4.1 <br>
 	 * 
 	 * Cohort.cs in method FolWeight() line 491 
@@ -277,7 +277,7 @@ public class PlantCalculator {
 	 * @return wood volume in meters cubed of an individual tree
 	 */
 	public static double treeStemVolume(double dbh){return Math.pow(dbh, 2d) * 0.001;}
-	
+
 	/** Wood energy volume for branches and debris for evergreen and deciduous trees <br>
 	 * 
 	 * Cohort.cs method Vol_WE() lines 513 - 546
@@ -292,35 +292,35 @@ public class PlantCalculator {
 	 * Move to species class.
 	 */
 	public static double branchesWoodyDebrisEnergyVolume(String kType, double dbh, double volume){
-		
-        double k1 = 0.0;       //coefficient large branches
-        double k2 = 0.0;       //coefficient large branches
-        double k3 = 0.0;       //coefficient woody debris
-        double k4 = 0.0;       //coefficient woody debris
-        double w_br = 0.0;     //factor large branches
-        double w_wd = 0.0;     //factor woody debris
-		
-        /* Evergreen trees */
+
+		double k1 = 0.0;       //coefficient large branches
+		double k2 = 0.0;       //coefficient large branches
+		double k3 = 0.0;       //coefficient woody debris
+		double k4 = 0.0;       //coefficient woody debris
+		double w_br = 0.0;     //factor large branches
+		double w_wd = 0.0;     //factor woody debris
+
+		/* Evergreen trees */
 		if(kType.startsWith("E")){
-            k1 = -8.7330758;
-            k2 = 0.059208154;
-            k3 = -1.933950168;
-            k4 = -0.016986685;
-            w_br = Math.exp(k1 + k2 * dbh);
-            w_wd = Math.exp(k3 + k4 * dbh);
+			k1 = -8.7330758;
+			k2 = 0.059208154;
+			k3 = -1.933950168;
+			k4 = -0.016986685;
+			w_br = Math.exp(k1 + k2 * dbh);
+			w_wd = Math.exp(k3 + k4 * dbh);
 		} 
 		/* Deciduous trees */
 		else if(kType.startsWith("D")){
-            k1 = -4.9398872;
-            k2 = 0.061619224;
-            k3 = -1.206413264;
-            k4 = -0.019186451;
-            w_br = Math.exp(k1 + k2 * dbh);
-            w_wd = Math.exp(k3 + k4 * dbh);
+			k1 = -4.9398872;
+			k2 = 0.061619224;
+			k3 = -1.206413264;
+			k4 = -0.019186451;
+			w_br = Math.exp(k1 + k2 * dbh);
+			w_wd = Math.exp(k3 + k4 * dbh);
 		}
 		return woodEnergyVolume(w_br, volume) + woodEnergyVolume(w_wd, volume);
 	}
-	
+
 	/** Wood energy volume< br>
 	 * 
 	 * Cohort.cs method Vol_WE() line 543 - 544
@@ -332,7 +332,7 @@ public class PlantCalculator {
 	public static double woodEnergyVolume(double woodFactor, double volume){
 		return woodFactor / (1d + woodFactor) * volume;
 	}
-	
+
 	/** Parameters for calculating biomass of wood
 	 * 
 	 * Cohort.cs methods StandBiomass() and BranchesBiomass() lines 568 - 581, 596 - 609
@@ -348,15 +348,15 @@ public class PlantCalculator {
 		double cdf = 0.0;
 
 		if(kType.startsWith("E")){
-                    bef = 1.3;
-                    cdf = 0.51;
+			bef = 1.3;
+			cdf = 0.51;
 		} else if(kType.startsWith("D")){
-                    bef = 1.4;
-                    cdf = 0.48;
+			bef = 1.4;
+			cdf = 0.48;
 		}
 		return bef * cdf;
 	}
-	
+
 	/** Wood Biomass (aboveground Carbon) [MM] <br>
 	 * 
 	 * Cohort.cs method StemBiomass() lines 583, 611
@@ -370,7 +370,7 @@ public class PlantCalculator {
 	public static double woodyBiomass(double volume, double kWD, double bef, double cdf){
 		return volume * kWD * bef * cdf * 1000d;
 	}
-	
+
 	/** Wood Biomass (aboveground Carbon) [MM] <br>
 	 * 
 	 * Cohort.cs method StemBiomass() and BranchesBiomass() lines 583, 611
@@ -384,7 +384,7 @@ public class PlantCalculator {
 	public static double woodyBiomass(double volume, double kWD, double woodyBiomassParam){
 		return volume * kWD * woodyBiomassParam * 1000d;
 	}
-	
+
 	/** Basal area of a tree
 	 * 
 	 * Cohort.cs method BasalArea() line 640
@@ -394,7 +394,7 @@ public class PlantCalculator {
 	 * NOTE:  The C# code calculated for the cohort.
 	 */
 	public static double basalArea(double dbh){return Math.PI * dbh * dbh * 0.25;}
-	
+
 	/** Calculate the foliage area of an individual tree<br>
 	 * 
 	 * NOTE: This is just a wrapper for foliageWeight() above.<br>
@@ -410,7 +410,7 @@ public class PlantCalculator {
 	public static double foliageArea(double kC2, double gA1, double dbh, double kA2){
 		return foliageWeight(dbh, kC2, gA1, kA2);
 	} 
-	
+
 	/** The foliage litter (TODO is this the weight?) for an entire cohort <br>
 	 * 
 	 *  Cohort.cs method FoliageLitter() lines 694 - 696
@@ -433,12 +433,12 @@ public class PlantCalculator {
 		double foliageWeightAll = foliageWeight(dbh, kC1, gA1, kA2);
 		double foliageWeightOrganic = foliageWeightAll * kAshFree;
 		double proportionLiveFoliageRetained = timeStep / kFRT;
-		
+
 		return foliageWeightOrganic * (
 				(double)liveTreeCount * proportionLiveFoliageRetained + 
 				(double)deadTreeCount);
 	}
-	
+
 	/** Calculate the twig litter of a single tree. <br>
 	 * 
 	 * Cohort.cs method TwigLitter line 710.<br>
@@ -453,7 +453,7 @@ public class PlantCalculator {
 		/* (Math.PI / 4d) is 0.7853982 */
 		return 0.7853982 * dbh * dbh * kConv * kAshFree;
 	}
-	
+
 	/** Calculate the root litter output of a single tree <br>
 	 * 
 	 * Cohort.cs method RootLitter Lines 726 - 728<br>
@@ -476,7 +476,7 @@ public class PlantCalculator {
 		double foliageOrganicWeightPerTree = foliageTotalDryWeightPerTree * kAshFree;
 		return kRSR * foliageTotalDryWeightPerTree;
 	}
-	
+
 	/** Calculate the root litter output of an entire cohort <br>
 	 * 
 	 * Cohort.cs method RootLitter Lines 726 - 728<br>
@@ -502,7 +502,7 @@ public class PlantCalculator {
 		double rootLitterPerTree = RootLitterPerTree(kC1, gA1, dbh, kA2, kRSR, kAshFree);
 		return rootLitterPerTree * ((double)countDeadTrees + (double)countLiveTrees / kFRT);
 	}
-	
+
 	/** Calculate the stemwood biomass of a single tree. <br>
 	 * 
 	 * Cohort.cs method WoodyLitter line 743<br>
@@ -515,7 +515,7 @@ public class PlantCalculator {
 	public static double stemwoodTree(double dbh){
 		return 0.12 * Math.pow(dbh, 2.4);
 	}
-	
+
 	/** Calculate the woody litter produced by a dead tree.<br>
 	 * 
 	 * Cohort.cs method WoodyLitter line 744 <br>
@@ -527,17 +527,17 @@ public class PlantCalculator {
 	public static double woodyLitter(double dbh, double kAshFree){
 		return stemwoodTree(dbh) * kAshFree;
 	}
-	
-	
+
+
 	//================================================================================
 	//
-    // The following methods are from the ForClim Plant class
+	// The following methods are from the ForClim Plant class
 	// C# source: Plant.cs 
-    //
+	//
 	// ================================================================================
-	
-	
-	
+
+
+
 	/** Light availability given the leaf area above
 	 * 
 	 * Plant.cs LightAvailability() lines 579 - 582
@@ -550,8 +550,8 @@ public class PlantCalculator {
 	public static double lightAvailablilty(double gLAI, double kLAtt){
 		return Math.exp(-kLAtt * gLAI);
 	}
-	
-	
+
+
 	/** Leaf area index
 	 * 
 	 * Plant.cs method LeafAreaIndex() line 672
@@ -563,19 +563,19 @@ public class PlantCalculator {
 	public static double leafAreaIndex(double gCumulativeFoliageArea, double kPatchSize){
 		return gCumulativeFoliageArea / kPatchSize;
 	}
-	
-	
-	
-	
+
+
+
+
 	//================================================================================
 	//
-    // The following methods are from the ForClim Species class
+	// The following methods are from the ForClim Species class
 	// C# source: Species.cs 
-    //
+	//
 	// ================================================================================
-	
-	
-	
+
+
+
 	/** Calculate the likelihood of browsing. <br>
 	 * 
 	 * Species.cs in method Initialize() lines 182 - 189<br>
@@ -590,15 +590,15 @@ public class PlantCalculator {
 		double kBrPrAdj = 0.01 * kBrPr;
 		switch(kBrow) //new relationship between kBrP and kBrPr for 5 levels of kBrow [MD]
 		{
-			case 1: return Math.pow(kBrPrAdj, 4);  
-			case 2: return Math.pow(kBrPrAdj, 2);  
-			case 3: return Math.pow(kBrPrAdj, 1);  
-			case 4: return Math.pow(kBrPrAdj, 0.5); 
-			case 5: return Math.pow(kBrPrAdj, 0.25); 
-			default: return 0d;
+		case 1: return Math.pow(kBrPrAdj, 4);  
+		case 2: return Math.pow(kBrPrAdj, 2);  
+		case 3: return Math.pow(kBrPrAdj, 1);  
+		case 4: return Math.pow(kBrPrAdj, 0.5); 
+		case 5: return Math.pow(kBrPrAdj, 0.25); 
+		default: return 0d;
 		}
 	}
-	
+
 	/** Calculate the slope of the s-change TODO find better description.
 	 * 
 	 * Species.cs Method Initialize() line 219
@@ -611,7 +611,7 @@ public class PlantCalculator {
 	public static double sChangeSlope(double kLa){
 		return 14d * kLa + 13d;
 	}
-	
+
 	/** Calculate the minimum value for the s-parameter.  TODO need better description
 	 * 
 	 * Species.cs method Initialize line 220
@@ -622,8 +622,8 @@ public class PlantCalculator {
 	 * TODO find sources for these constants
 	 */
 	public static double sMinValue(double kLa){return 1.3 * kLa + 39.5;}
-	
-	
+
+
 	/** Calculate the initial value for the skininess parameter. <br>
 	 * 
 	 * Species.cs method Initialize() line 221
@@ -632,107 +632,240 @@ public class PlantCalculator {
 	 * @return initial skininess parameter value
 	 */
 	public static double initialSkininess(double kSMin, double kE1){return kSMin + 0.75 * kE1;}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	/**
-	 * 
-	 * @param isDeciduous
-	 * @param mDDSe
-	 * @param mDDAn
-	 * @param kDDMin
-	 * @param kDrTol
-	 * @param kRedMax
-	 * @param kHMaxIn
+
+	/** Calculate the probability that new trees of this species 
+	 *  establish  new saplings. <br>
+	 *  
+	 *  Species.cs method Establishment() lines 291 - 321
+	 * @param kWiTN Minimum winter temperature threshold Species.cs
+	 * @param uWiT Maximum winter temperature observed Plant.cs
+	 * @param kWiTX Maximum winter temperature tolerated for regeneration Species.cs
+	 * @param gAL0 Light availability at forest floor Plant.cs
+	 * @param kLy Light requirement of tree saplings Species.cs
+	 * @param kBrP Browsing probability Species.cs
+	 * @param kDDMin Minimal annual degree-day sum Species.cs
+	 * @param kImmT Time bound of first occurrence of the species by immigration Species.cs
+	 * @param time TODO: current time? SubModel.cs
+	 * @param uDrSe seasonal drought index Plant.cs
+	 * @param uDrAn annual drought index Plant.cs
+	 * @param uDDSe seasonal degree days Plant.cs
+	 * @param uDDAn annual degree days Plant.cs
+	 * @param isDeciduous Is the tree deciduous or evergreen? Species.cs
+	 * @param kDrTol drought tolerance parameter Species.cs
+	 * @param kEstP Establishment probability coefficient Plant.cs
+	 * @param uniRand Uniform random number generator Plant.cs
 	 * @return
 	 */
-	public static double hMaxReduction(
-			boolean isDeciduous, double mDDSe, double mDDAn, 
-			double kDDMin, double kDrTol, double kRedMax, double kHMaxIn)
+	public static double establishmentProbability(
+			double kWiTN, double uWiT, double kWiTX,
+			double gAL0, double kLy, double kBrP, double kDDMin,
+			double kImmT, double time, 
+			double uDrSe, double uDrAn, double uDDSe, double uDDAn, 
+			boolean isDeciduous,
+			double kDrTol, double kEstP, Uniform uniRand)
 	{
-		double mDD;
-        double mDr;
-        
-		double gRedFacDI = 0.0;		//% reduction of Hmax caused by drought
-        double gRedFacDD = 0.0;		//% reduction of Hmax caused by degree days	
-    	double gRedFac = 0.0;;	//overall reduction of Hmax
-        double gHMax = 0.0;		//maximal possible tree height
-        if(isDeciduous){
-        	mDD = mDDSe;
-        	mDr = mDDSe;
-        } else
-        {
-        	mDD = mDDAn;
-        	mDr = mDDAn;
-        }
-		double toAdd = 470.947;
-		if(isDeciduous) toAdd = 352.9838;
-        double gDDOpt = kDDMin + toAdd;
-		
-        //Reduction caused by drought
-        gRedFacDI = 100 - (mDr / (kDrTol / (100 - kRedMax)));
-		gRedFacDI = Math.max(gRedFacDI, kRedMax);
-		
-		//Reduction caused by available degree days
-		if (kDDMin < gDDOpt) 
-		{
-			gRedFacDD = 100-((gDDOpt-mDD)*((100-kRedMax)/(gDDOpt-kDDMin)));
-			gRedFacDD = Math.min(gRedFacDD,100);
-			gRedFacDD = Math.max(gRedFacDD,kRedMax);
+
+		double gDr = uDrAn;
+		double gDD = uDDAn;
+
+		if(isDeciduous){
+			gDr = uDrSe;
+			gDD = uDDSe;
 		}
-		else {gRedFacDD = 100.0;}
-		
+
+		/* Winter temperature establishment flag*/
+		double WTEF;    
+		/* Light availability establishment flag*/
+		double ALEF;    
+		/* Browsing pressure establishment flag*/
+		double BPEF;    
+		/* Degree-days establishment flag*/
+		double DDEF;    
+		/* Immigration establishment flag */
+		double IMEF;    
+		/* Soil moisture establishment flag; new [MD]*/
+		double SMEF;    
+
+		/* Winter temperature */
+		if(kWiTN <= uWiT & uWiT < kWiTX) WTEF = 1d; else WTEF = 0d;
+		/* Light availability */
+		if(gAL0 < kLy) ALEF = 0d; else ALEF = 1d;
+		/* Browsing pressure */
+		if(uniRand.nextDouble() < kBrP) BPEF = 0d; else BPEF = 1d;
+		/* Immigration establishment */
+		if(kImmT <= time) IMEF = 1d; else IMEF = 0d;
+		/* Degree days */
+		if(kDDMin < gDD) DDEF = 1d; else DDEF = 0d;
+		/* Soil moisture */
+		if(gDr > kDrTol) SMEF = 0d; else SMEF = 1d;
+
+		return kEstP*WTEF*ALEF*BPEF*DDEF*IMEF*SMEF;
+	}
+
+	/** Calculate this season's overall growth reduction factor for this species.
+	 * 
+	 * Species.cs method Growth() lines 324 - 370
+	 * 
+	 * @param gDD species-specific sum of this season's growing degree days Species.cs
+	 * @param gDr species-specific drought index for this year's season Species.cs
+	 * @param algf available light growth factor Species.cs
+	 * @param kDDMin species-specific minimum annual growing degree days Species.cs
+	 * @param kDDSl Exponential slope parameter : degree-day growth factor Plant.cs
+	 * @param kDrTol Species-specific drought tolerance parameter Species.cs
+	 * @param kN1 Nitrogen response function parameter Species.cs
+	 * @param uAvN Nitrogen availability Plant.cs
+	 * @param kN2 Nitrogen response function parameter Species.cs
+	 * @return growth reduction factor (percent)
+	 */
+	public static double speciesGrowthReductionFactor(
+			double gDD, double gDr, double algf,
+			double kDDMin, double kDDSl, double kDrTol, 
+			double kN1, double uAvN, double kN2)
+	{
+		/* Degree-day growth factor*/
+		double ddgf = Math.max(0.0, 1 - Math.exp((kDDMin - gDD) * kDDSl));    
+		/* Soil moisture growth factor*/
+		double smgf = Math.sqrt(Math.max(0, 1 - gDr / kDrTol));
+		/* Soil nitrogen growth factor*/
+		double sngf = Math.max(0.0, 1 - Math.exp(kN1 * (uAvN - kN2)));
+		/* Mean growth reduction factor*/
+
+		ddgf = Math.max(0.0, 1 - Math.exp((kDDMin - gDD) * kDDSl)); //1; 
+		smgf = Math.sqrt(Math.max(0, 1 - gDr / kDrTol)); //1; 
+		sngf = Math.max(0.0, 1 - Math.exp(kN1 * (uAvN - kN2))); //1; 
+
+		return Math.pow(ddgf * smgf * sngf, 1d / 3d);
+	}
+
+	/** Calculate the species-specific mortality rate for the current season. <br>
+	 * 
+	 * Species.cs method Mortality() line 378
+	 * 
+	 * @param kDeathP mortality probability coefficient Plant.cs
+	 * @param kAMax maximum tree age
+	 * @param timeStep length of time step
+	 * @return probability of age-related mortality
+	 */
+	public static double speciesMortalityRate(double kDeathP, double kAMax, double timeStep){
+		return timeStep * kDeathP / kAMax;
+	}
+
+	/** Calculate the value after which degree days are no longer limiting. <br>
+	 * 
+	 * Species.cs method HMaxReduction() line 443
+	 * 
+	 * @param isDeciduous
+	 * @param kDDMin 	Minimal annual degree-day sum
+	 * @return value after which degee days are no longer limiting
+	 */
+	public static double maxLimitingDegreeDays(boolean isDeciduous, double kDDMin){
+		if(isDeciduous) return kDDMin + 470.947;
+		else return kDDMin + 352.9383;
+	}
+
+	/** Calculate the proportion of growth reduced by drought conditions. <br>
+	 * 
+	 * Species.cs method HMaxReduction() line 444
+	 * 
+	 * @param mDr  mean annual/seasonal drought index
+	 * @param kDrTol Drought tolerance parameter
+	 * @param kRedMax Maximal reduction of HMax
+	 * @return percent reduction due to drought
+	 */
+	public static double speciesDroughtGrowthReduction(double mDr, double kDrTol, double kRedMax){
+		return Math.max(100d - (mDr / (kDrTol / (100d - kRedMax))), kRedMax);
+	}
+
+	/** Calculate the reduction factor due to degree days for the maximum height of a cohort. <br>
+	 * 
+	 * Species.cs method HMaxReduction() lines 457 - 464
+	 * 
+	 * @param gDDOpt value after which degree days are no longer limiting
+	 * @param mDD mean annual/seasonal degree days
+	 * @param kRedMax maximum reduction the height
+	 * @param kDDMin minimum annual degree days required for growth
+	 * @return The percentage by which the species' maximum height is reduced due to temperature
+	 */
+	public static double maxHeightDegreeDayGrowthReductionFactor(double gDDOpt, double mDD, double kRedMax, double kDDMin){
+		double gRedFacDD = 100-((gDDOpt-mDD)*((100-kRedMax)/(gDDOpt-kDDMin)));
+		if(kDDMin < gDDOpt)
+			return Math.max(Math.min(gRedFacDD,100), kRedMax);
+		else return 100d;
+	}
+
+
+	/** Calculate the maximum height for this species given the site propoerties. <br>
+	 * 
+	 * Species.cs method hMaxReduction() lines 435 - 475
+	 * 
+	 * @param isDeciduous is the tree deciduous (or evergreen: false)
+	 * @param mDDSe total seasonal degree days obwerved for the current year in this cell (for deciduous trees)
+	 * @param mDDAn total annual degree days observed for the current year in this cell (for evergreen trees)
+	 * @param kDDMin minimal annual degree day sum for growth of this species
+	 * @param kDrTol drought tolerance parameter
+	 * @param kRedMax maximum possible reduction factor for hMax
+	 * @param kHMaxIn absolute maximum tree height for this species
+	 * @return maximal possible tree height in cm
+	 */
+	public static double hMaxReduction(
+			boolean isDeciduous, 
+			double mDDSe, double mDDAn, double kDDMin, 
+			double mDrSe, double mDrAn, double kDrTol, 
+			double kRedMax, double kHMaxIn)
+	{
+
+		/* reduction of Hmax caused by drought */
+		double gRedFacDI = 0.0;		
+		/* reduction of Hmax caused by degree days */	
+		double gRedFacDD = 0.0;		
+		/* overall reduction of Hmax*/
+		double gRedFac = 0.0;
+		/* mean annual/seasonal degree days */
+		double mDD; // = CaseOf(isDeciduous, mDDSe, mDDAn);		
+		/* mean annual/seasonal drought index*/
+		double mDr; // = CaseOf(isDeciduous, mDrSe, mDrAn);		
+		/* value after which degree days are no longer limiting */
+		if(isDeciduous){mDD = mDDSe; mDr = mDrSe;} else{mDD = mDDAn; mDr = mDrAn; }
+		double gDDOpt = PlantCalculator.maxLimitingDegreeDays(isDeciduous, mDD);
+		/* Reduction caused by drought */
+		gRedFacDI = PlantCalculator.speciesDroughtGrowthReduction(mDr, kDrTol, kRedMax);
+		/* Reduction caused by available degree days */
+		gRedFacDD = PlantCalculator.maxHeightDegreeDayGrowthReductionFactor(gDDOpt, mDD, kRedMax, kDDMin);
+
+		//Reduction caused by drought
+		gRedFacDI = speciesDroughtGrowthReduction(mDr, kDrTol, kRedMax);
+
+		//Reduction caused by available degree days
+		gRedFacDD = maxHeightDegreeDayGrowthReductionFactor(gDDOpt, mDD, kRedMax, kDDMin);
+
 		//Calculation of final reduction of Hmax
 		gRedFac = Math.min(gRedFacDI,gRedFacDD);
-//		gRedFac = Math.Min(Math.Min(gRedFacAvN,gRedFacDI),gRedFacDD);
+
+		return kHMaxIn * gRedFac;
 		
-		gHMax = kHMaxIn / 100d * gRedFac;
-		gHMax *= 100d;	//m to cm
-		
-		return gHMax;
-		
+		/*  Unused nitrogen components */ 
+		//      	double gRedFacAvN = 0.0;	//% reduction of Hmax caused by low nitrogen     
+		//        	double gAvNOpt = 100;			//value after which nitrogen is no longer limiting
+		//Reduction caused by nitrogen content
+		//		gRedFacAvN = 100-((gAvNOpt-p.uAvN)*((100-kRedMax)/(gAvNOpt-kN2)));
+		//		gRedFacAvN = Math.min(gRedFacAvN,100);
+		//		gRedFacAvN = Math.max(gRedFacAvN,kRedMax);
+		//		gRedFac = Math.min(Math.min(gRedFacAvN,gRedFacDI),gRedFacDD);
 	}
-	
-	
-	
-	
-	
+
+
+
+	public static double CaseOf(boolean test, double pass, double fail) {
+		if(test) return pass;
+		else return fail;
+	}
+
+
+
+
+
+
+
 
 	/** ForClim v.3.0 equation 4.3
 	 * @param gLAI0 leaf area index above the cohort //TODO? this is unclear in the maual
@@ -754,14 +887,14 @@ public class PlantCalculator {
 		return gFolAreaAbove / kPatchSize;
 	} //TODO verify in C# source May be duplicate of method above
 
-//	/** ForClim v.3.0 equation 4.6
-//	 * @param kLatt light attenuation coefficient
-//	 * @param gLAIh cumulative leaf area index above cohort
-//	 * @return
-//	 */
-//	public static double forClimAvailableLight(double kLatt, double gLAIh){
-//		return Math.exp(-kLatt * gLAIh);
-//	} //TODO verify in C# source
+	//	/** ForClim v.3.0 equation 4.6
+	//	 * @param kLatt light attenuation coefficient
+	//	 * @param gLAIh cumulative leaf area index above cohort
+	//	 * @return
+	//	 */
+	//	public static double forClimAvailableLight(double kLatt, double gLAIh){
+	//		return Math.exp(-kLatt * gLAIh);
+	//	} //TODO verify in C# source
 
 	/** ForClim v.3.0 equation 4.7
 	 * 
@@ -820,9 +953,9 @@ public class PlantCalculator {
 
 
 
-	
-	
-	
+
+
+
 	/** ForClim v.3.0 equation 4.15a ForClim manual version
 	 * @param kCLGF_a crown length growth factor parameter, hard-coded in the original as 4/3
 	 * @param gA1 allometric parameter for dbh and foliage weight relationship
@@ -970,7 +1103,7 @@ public class PlantCalculator {
 						if(unif.nextDouble() > kBrPr){
 							out = kEstP;
 						} 
-			}}}}
+					}}}}
 
 		//TODO implement immigration flag?
 		return out;
@@ -997,7 +1130,7 @@ public class PlantCalculator {
 	} //TODO verify in C# source
 
 
-	
+
 	/** ForClim v.3.0 equation 4.31: Increment the counter of slow growth years.
 	 * @param sGrC number of years a cohort has grown slowly
 	 * @param growthReductionFactor the calculated growth reduction factor from the grow() method
@@ -1008,15 +1141,15 @@ public class PlantCalculator {
 	public static int forClimSlowGrowthIncrementer(int sGrC, double growthReductionFactor, double kMinRelInc, double dbhIncrement, double kMinAbsInc){
 		if(growthReductionFactor < kMinRelInc | dbhIncrement < kMinAbsInc) return sGrC +1;
 		else return 0;
-		
+
 	} //TODO verify in C# source
-	
 
 
-	
-	
-	
-	
+
+
+
+
+
 } //TODO verify in C# source
 
 
