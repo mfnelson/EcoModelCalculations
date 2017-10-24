@@ -866,286 +866,286 @@ public class PlantCalculator {
 
 
 
-
-	/** ForClim v.3.0 equation 4.3
-	 * @param gLAI0 leaf area index above the cohort //TODO? this is unclear in the maual
-	 * @param kLAImax 
-	 * @return
-	 */
-	public static double forClimLeafAreaIndexShadingFactor(double gLAI0, double kLAImax){
-		return Math.min(1d, gLAI0 / kLAImax); 
-	} //TODO verify in C# source
-
-
-
-	/** ForClim v.3.0 equation 4.5
-	 * @param kPatchSize patch size in square meters
-	 * @param gFolAreaAbove cumulative foliage area above the cohort.
-	 * @return cumulative leaf area index at a cohort height
-	 */
-	public static double forClimLeafAreaIndexAtCohortHeight(double kPatchSize, double gFolAreaAbove){
-		return gFolAreaAbove / kPatchSize;
-	} //TODO verify in C# source May be duplicate of method above
-
-	//	/** ForClim v.3.0 equation 4.6
-	//	 * @param kLatt light attenuation coefficient
-	//	 * @param gLAIh cumulative leaf area index above cohort
-	//	 * @return
-	//	 */
-	//	public static double forClimAvailableLight(double kLatt, double gLAIh){
-	//		return Math.exp(-kLatt * gLAIh);
-	//	} //TODO verify in C# source
-
-	/** ForClim v.3.0 equation 4.7
-	 * 
-	 * @param kG species-specific growth parameter
-	 * @param dbh current dbh
-	 * @param height current height
-	 * @param hMax max height for the species
-	 * @param fH function that distributes volume growth between height and diameter
-	 * @return
-	 */
-	public static double forClimIdealDiameterIncrement(double kG, double dbh, double height, double hMax, double fH){
-		double numerator = 1d - (height / hMax);
-		double denominator = 2d * height + fH * dbh;
-		return(kG * dbh * (numerator / denominator));
-	} //TODO verify in C# source
-
-	/** ForClim v.3.0 equation 4.8
-	 * @param dDGF degree days growth factor
-	 * @param sMGF soil moisture growth factor
-	 * @param sNGF soil nitrogen growth factor
-	 * @param aLGF available light growth factor
-	 * @return
-	 */
-	public static double forClimGrowthReductionFactor(double dDGF, double sMGF, double sNGF, double aLGF){
-		return Math.pow(dDGF * sMGF * sNGF * aLGF, 0.3333333);
-	} //TODO verify in C# source
-
-	/** ForClim v 3.0 equation 4.9 
-	 * @param speciesDegDayMin
-	 * @param degDaySlopeParam
-	 * @param speciesDegreeDaySum
-	 * @return
-	 */
-	public static double forClimDegreeDayGrowthFactor(
-			double speciesDegDayMin, double degDaySlopeParam, double speciesDegreeDaySum)
-	{return Math.max(0, 1d - Math.exp((speciesDegDayMin - speciesDegreeDaySum) * degDaySlopeParam));} //TODO verify in C# source
-
-	/** ForClim v3.0 equation 4.10
-	 * @param gDr annual drought index
-	 * @param kGrTol species-specific drought tolerance parameter
-	 * @return
-	 */
-	public static double forClimSoilMoistureGrowthFactor(double gDr, double kGrTol){
-		return Math.sqrt(Math.max(0, 1d - gDr / kGrTol));
-	} //TODO verify in C# source
-
-	/** ForClim v.3.0 equation 4.11 
-	 * @param kN1 species-specific nitrogen response parameter
-	 * @param kN2 species-specific nitrogen repsonse parameter
-	 * @param uAvN available nitrogen in kg/ha
-	 * @return
-	 */
-	public static double forClimSoilNitrogenGrowthFactor(double kN1, double kN2, double uAvN){
-		return Math.max(0, 1d - Math.exp(kN1 * (uAvN - kN2)));
-	} //TODO verify in C# source
-
-
-
-
-
-
-	/** ForClim v.3.0 equation 4.15a ForClim manual version
-	 * @param kCLGF_a crown length growth factor parameter, hard-coded in the original as 4/3
-	 * @param gA1 allometric parameter for dbh and foliage weight relationship
-	 * @param kA1max maximum value for parameter gA1
-	 * @param kLCPs species-specific light compensation point
-	 * @param kLCPmean mean light compensation point considering all species
-	 * @return
-	 */
-	public static double forClimCrownLengthGrowthFactor(double kCLGF_a, double gA1, double kA1max,double kLCPs, double kLCPmean){
-		return Math.min(kCLGF_a * (gA1 * kLCPs) / (kA1max * kLCPmean), 1d); 
-	} //TODO verify in C# source
-	/** ForClim v.3.0 equation 4.15b ForClim C# source version
-	 * @param kCLGF_a crown length growth factor parameter, hard-coded in the original as 4/3
-	 * @param gA1 allometric parameter for dbh and foliage weight relationship
-	 * @param kA1max maximum value for parameter gA1
-	 * @param kA1min minimum value for parameter gA1
-	 * @param kLCPs species-specific light compensation point
-	 * @param kLCPmean mean light compensation point considering all species
-	 * @return
-	 */
-	public static double forClimCrownLengthGrowthFactor(double kCLGF_a, double gA1, double kA1max, double kA1min, double kLCPs, double kLCPmean){
-		return Math.min(kCLGF_a * (gA1 * kLCPs) / ((kA1max - kA1min) * kLCPmean), 1d); // TODO the C# code is different here
-	} //TODO verify in C# source
-
-	public static double forClimInitialHeight(double kB1, double hMax, double kSIn, double dbh){
-		double adjHMax = hMax - kB1;
-		double proportion = Math.exp(-kSIn * dbh / adjHMax);
-		double unadjustedOut = adjHMax * proportion;
-		return kB1 + unadjustedOut;
-	} //TODO verify in C# source
-
-	/** ForCoim v.3.0 equation 4.16
-	 * 
-	 * @param dbh current dbh
-	 * @param fH function distributing volume growth among height and dbh
-	 * @return
-	 */
-	public static double forClimHeightIncrement(double dbh, double fH){
-		return fH * dbh;
-	} //TODO verify in C# source
-
-	/** From the ForClim v 3.0 equation 4.17. 
-	 * @param height
-	 * @param maxHeight
-	 * @param b1
-	 * @param competition
-	 * @return
-	 */
-	public static double forClimFH(double height, double maxHeight, double b1, double competition){
-		return competition * (1d - (height - b1) / (maxHeight - b1));
-	} //TODO verify in C# source
-
-	/** ForClim v 3.0 equation 4.18
-	 * @param sMin species specific parameter: the smallest value the s-parameter can take
-	 * @param kE1 species specific slope of the s-change
-	 * @param aLH light intensity at the top of the tree's (cohort's) crown.
-	 * @return
-	 */
-	public static double forClimCompetition(double sMin, double kE1, double aLH){
-		return sMin + kE1 * (1d - aLH);
-	} //TODO verify in C# source
-
-	/** ForClim v3.0 height reduction equation from C# code
-	 * 
-	 * @param mDD mean (annual or seasonal) degree days based on long-term data;
-	 * @param mDr mean (annual or seasonal) drought index based on long-term mean data;
-	 * @param kDDMin minimal annual degree day sum for the species to grow.
-	 * @param kDDRedRange the magnitude of the range in degree days between kDDMin and the value after which degree days are no longer limiting
-	 * @param kDrTol drought tolerance parameter
-	 * @param kRedMax greatest percent by which the max height may be reduced.
-	 * @param kHMaxIn the species-specific unadjusted maximum height under nonlimiting conditiosn
-	 * @param uAvN (not currently used) nitrogen availability in kg * ha-1
-	 * @param kN2 (not currently used) nitrogen response parameter in kg * ha-1 * yr -1
-	 * @param gAvNOpt (not currently used) value after which nitrogen is no longer limiting
-	 * @return
-	 */
-	public static double forClimAdjustedMaxHeight(
-			double mDD, double mDr, 
-			double kDDMin, double kDDRedRange, //TODO make this a parameter 
-			double kDrTol,
-			double kRedMax, double kHMaxIn)
-	//			double uAvN, double kN2, double gAvNOpt) /* these are commented out in the C# code. */
-	{
-		/* lowest possible value for overall reduction percent*/
-		double minHmaxPct = 100d - kRedMax;
-
-		/* Reduction caused by drought */
-		double gRedFacDI = 100d - mDr * minHmaxPct / kDrTol;
-		gRedFacDI = Math.max(gRedFacDI,  kRedMax);
-
-		//		/* Reduction caused by nitrogen content. 
-		//		 * This is commented out in the C# code!*/
-		//		double gRedFacAvN = 100d - (gAvNOpt - uAvN) * minHmaxPct / (gAvNOpt - kN2);
-		//		gRedFacAvN = Math.min(Math.max(gRedFacAvN, 100d), kRedMax);
-
-		/* Reduction caused by degree days. */
-		double gRedFacDD = 100d;
-		/* Value after which degree days are no longer limiting. */
-		double gDDOpt = kDDMin + kDDRedRange;
-		if(kDDMin < gDDOpt){
-			gRedFacDD = 100d - (gDDOpt - mDD) * minHmaxPct / (gDDOpt - kDDMin);
-		} //TODO verify in C# source
-
-		/* Final reduction is the lowest of the component reductions. */
-		//		double finalRedFac = Math.min(gRedFacDI, Math.min(gRedFacAvN, gRedFacDD));
-		double finalRedFac = Math.min(gRedFacDD, gRedFacDI) / 100d;
-		return kHMaxIn * finalRedFac;
-	} //TODO verify in C# source
-
-	/** ForClim v.3.0 equation 4.19
-	 *  Equations 4.20 to 4.26 are implemented within this method.
-	 * @param unif a uniform random number generator
-	 * @param kEstP rate of seedling establishment (0 - 1) to account for other factors (pathogens, etc.)
-	 * @param kDrTol species-specific drought tolerance
-	 * @param uDr this season's drought index
-	 * @param kWiTX winter low temp maximum threshold
-	 * @param uWiT observed winter minimum temperature
-	 * @param kWiTN winter low temp minimum threshold 
-	 * @param kDDMin species-specific minimum degree day requirement
-	 * @param uDD observed sum of degree days during growing season
-	 * @param kLy sapling shade tolerance
-	 * @param uAL0 light availability on the forest floor
-	 * @param kBrPr browsing pressure
-	 * @param aKbrow exponent for levels of browsing sensitivity
-	 * @return the probability that any seedlings of the species establish this year
-	 */
-	public static double forClimProbabilityEstablishment(
-			Uniform unif, double kEstP, double kDrTol, 
-			double uDr, double kWiTx, double uWiT, double kWiTN, 
-			double kDDMin, double uDD, double kLy, double uAL0, 
-			double kBrPr)
-	{
-
-		double out = 0d;
-
-		/* Soil moisture establishment flag */
-		if(kDrTol > uDr){
-			/* Winter temperature establishment flag */
-			if(kWiTx > uWiT & uWiT > kWiTN){
-				/* Degree days flag */
-				if(kDDMin < uDD){
-					/* Light availablilty flag. */
-					if(kLy < uAL0){
-						/* Browsing probability flag */
-						if(unif.nextDouble() > kBrPr){
-							out = kEstP;
-						} 
-					}}}}
-
-		//TODO implement immigration flag?
-		return out;
-	} //TODO verify in C# source
-
-	/** ForClim v 3.0 equation 4.27
-	 * 
-	 * @param kEstDens maximum sapling establishment rate
-	 * @param kPatchSize size of the forest patch in hectares
-	 * @param kLa species-specific shade tolerance
-	 * @return
-	 */
-	public static int forClimMaximumSaplingEstablishmentRate(double kEstDens, double kPatchSize, double kLa){
-		return (int)(0.5 + kEstDens * (kPatchSize * 1E4) * kLa); // Remember that patch size is in hectares!
-	} //TODO verify in C# source
-
-	/** ForClim v.3.0 equation 4.29
-	 * @param kDeathP mortality probability coefficient
-	 * @param kAm species-specific maximum tree age
-	 * @return
-	 */
-	public static double forClimBackgroundMortalityPct(double kDeathP, double kAm){
-		return kDeathP / kAm;
-	} //TODO verify in C# source
-
-
-
-	/** ForClim v.3.0 equation 4.31: Increment the counter of slow growth years.
-	 * @param sGrC number of years a cohort has grown slowly
-	 * @param growthReductionFactor the calculated growth reduction factor from the grow() method
-	 * @param kMinRelInc minimum threshold percentage of the ideal diameter growth increment below which growth is considered slow
-	 * @param dbhIncrement the cohort's trees' most recent dbh increment in cm
-	 * @param kMinAbsInc the minimum threshold of annual radial growth below which growth is considered slow
-	 * @return incremented counter if growth is slow, 0 otherwise	 */
-	public static int forClimSlowGrowthIncrementer(int sGrC, double growthReductionFactor, double kMinRelInc, double dbhIncrement, double kMinAbsInc){
-		if(growthReductionFactor < kMinRelInc | dbhIncrement < kMinAbsInc) return sGrC +1;
-		else return 0;
-
-	} //TODO verify in C# source
-
-
-
+//
+//	/** ForClim v.3.0 equation 4.3
+//	 * @param gLAI0 leaf area index above the cohort //TODO? this is unclear in the maual
+//	 * @param kLAImax 
+//	 * @return
+//	 */
+//	public static double forClimLeafAreaIndexShadingFactor(double gLAI0, double kLAImax){
+//		return Math.min(1d, gLAI0 / kLAImax); 
+//	} //TODO verify in C# source
+//
+//
+//
+//	/** ForClim v.3.0 equation 4.5
+//	 * @param kPatchSize patch size in square meters
+//	 * @param gFolAreaAbove cumulative foliage area above the cohort.
+//	 * @return cumulative leaf area index at a cohort height
+//	 */
+//	public static double forClimLeafAreaIndexAtCohortHeight(double kPatchSize, double gFolAreaAbove){
+//		return gFolAreaAbove / kPatchSize;
+//	} //TODO verify in C# source May be duplicate of method above
+//
+//	//	/** ForClim v.3.0 equation 4.6
+//	//	 * @param kLatt light attenuation coefficient
+//	//	 * @param gLAIh cumulative leaf area index above cohort
+//	//	 * @return
+//	//	 */
+//	//	public static double forClimAvailableLight(double kLatt, double gLAIh){
+//	//		return Math.exp(-kLatt * gLAIh);
+//	//	} //TODO verify in C# source
+//
+//	/** ForClim v.3.0 equation 4.7
+//	 * 
+//	 * @param kG species-specific growth parameter
+//	 * @param dbh current dbh
+//	 * @param height current height
+//	 * @param hMax max height for the species
+//	 * @param fH function that distributes volume growth between height and diameter
+//	 * @return
+//	 */
+//	public static double forClimIdealDiameterIncrement(double kG, double dbh, double height, double hMax, double fH){
+//		double numerator = 1d - (height / hMax);
+//		double denominator = 2d * height + fH * dbh;
+//		return(kG * dbh * (numerator / denominator));
+//	} //TODO verify in C# source
+//
+//	/** ForClim v.3.0 equation 4.8
+//	 * @param dDGF degree days growth factor
+//	 * @param sMGF soil moisture growth factor
+//	 * @param sNGF soil nitrogen growth factor
+//	 * @param aLGF available light growth factor
+//	 * @return
+//	 */
+//	public static double forClimGrowthReductionFactor(double dDGF, double sMGF, double sNGF, double aLGF){
+//		return Math.pow(dDGF * sMGF * sNGF * aLGF, 0.3333333);
+//	} //TODO verify in C# source
+//
+//	/** ForClim v 3.0 equation 4.9 
+//	 * @param speciesDegDayMin
+//	 * @param degDaySlopeParam
+//	 * @param speciesDegreeDaySum
+//	 * @return
+//	 */
+//	public static double forClimDegreeDayGrowthFactor(
+//			double speciesDegDayMin, double degDaySlopeParam, double speciesDegreeDaySum)
+//	{return Math.max(0, 1d - Math.exp((speciesDegDayMin - speciesDegreeDaySum) * degDaySlopeParam));} //TODO verify in C# source
+//
+//	/** ForClim v3.0 equation 4.10
+//	 * @param gDr annual drought index
+//	 * @param kGrTol species-specific drought tolerance parameter
+//	 * @return
+//	 */
+//	public static double forClimSoilMoistureGrowthFactor(double gDr, double kGrTol){
+//		return Math.sqrt(Math.max(0, 1d - gDr / kGrTol));
+//	} //TODO verify in C# source
+//
+//	/** ForClim v.3.0 equation 4.11 
+//	 * @param kN1 species-specific nitrogen response parameter
+//	 * @param kN2 species-specific nitrogen repsonse parameter
+//	 * @param uAvN available nitrogen in kg/ha
+//	 * @return
+//	 */
+//	public static double forClimSoilNitrogenGrowthFactor(double kN1, double kN2, double uAvN){
+//		return Math.max(0, 1d - Math.exp(kN1 * (uAvN - kN2)));
+//	} //TODO verify in C# source
+//
+//
+//
+//
+//
+//
+//	/** ForClim v.3.0 equation 4.15a ForClim manual version
+//	 * @param kCLGF_a crown length growth factor parameter, hard-coded in the original as 4/3
+//	 * @param gA1 allometric parameter for dbh and foliage weight relationship
+//	 * @param kA1max maximum value for parameter gA1
+//	 * @param kLCPs species-specific light compensation point
+//	 * @param kLCPmean mean light compensation point considering all species
+//	 * @return
+//	 */
+//	public static double forClimCrownLengthGrowthFactor(double kCLGF_a, double gA1, double kA1max,double kLCPs, double kLCPmean){
+//		return Math.min(kCLGF_a * (gA1 * kLCPs) / (kA1max * kLCPmean), 1d); 
+//	} //TODO verify in C# source
+//	/** ForClim v.3.0 equation 4.15b ForClim C# source version
+//	 * @param kCLGF_a crown length growth factor parameter, hard-coded in the original as 4/3
+//	 * @param gA1 allometric parameter for dbh and foliage weight relationship
+//	 * @param kA1max maximum value for parameter gA1
+//	 * @param kA1min minimum value for parameter gA1
+//	 * @param kLCPs species-specific light compensation point
+//	 * @param kLCPmean mean light compensation point considering all species
+//	 * @return
+//	 */
+//	public static double forClimCrownLengthGrowthFactor(double kCLGF_a, double gA1, double kA1max, double kA1min, double kLCPs, double kLCPmean){
+//		return Math.min(kCLGF_a * (gA1 * kLCPs) / ((kA1max - kA1min) * kLCPmean), 1d); // TODO the C# code is different here
+//	} //TODO verify in C# source
+//
+//	public static double forClimInitialHeight(double kB1, double hMax, double kSIn, double dbh){
+//		double adjHMax = hMax - kB1;
+//		double proportion = Math.exp(-kSIn * dbh / adjHMax);
+//		double unadjustedOut = adjHMax * proportion;
+//		return kB1 + unadjustedOut;
+//	} //TODO verify in C# source
+//
+//	/** ForCoim v.3.0 equation 4.16
+//	 * 
+//	 * @param dbh current dbh
+//	 * @param fH function distributing volume growth among height and dbh
+//	 * @return
+//	 */
+//	public static double forClimHeightIncrement(double dbh, double fH){
+//		return fH * dbh;
+//	} //TODO verify in C# source
+//
+//	/** From the ForClim v 3.0 equation 4.17. 
+//	 * @param height
+//	 * @param maxHeight
+//	 * @param b1
+//	 * @param competition
+//	 * @return
+//	 */
+//	public static double forClimFH(double height, double maxHeight, double b1, double competition){
+//		return competition * (1d - (height - b1) / (maxHeight - b1));
+//	} //TODO verify in C# source
+//
+//	/** ForClim v 3.0 equation 4.18
+//	 * @param sMin species specific parameter: the smallest value the s-parameter can take
+//	 * @param kE1 species specific slope of the s-change
+//	 * @param aLH light intensity at the top of the tree's (cohort's) crown.
+//	 * @return
+//	 */
+//	public static double forClimCompetition(double sMin, double kE1, double aLH){
+//		return sMin + kE1 * (1d - aLH);
+//	} //TODO verify in C# source
+//
+//	/** ForClim v3.0 height reduction equation from C# code
+//	 * 
+//	 * @param mDD mean (annual or seasonal) degree days based on long-term data;
+//	 * @param mDr mean (annual or seasonal) drought index based on long-term mean data;
+//	 * @param kDDMin minimal annual degree day sum for the species to grow.
+//	 * @param kDDRedRange the magnitude of the range in degree days between kDDMin and the value after which degree days are no longer limiting
+//	 * @param kDrTol drought tolerance parameter
+//	 * @param kRedMax greatest percent by which the max height may be reduced.
+//	 * @param kHMaxIn the species-specific unadjusted maximum height under nonlimiting conditiosn
+//	 * @param uAvN (not currently used) nitrogen availability in kg * ha-1
+//	 * @param kN2 (not currently used) nitrogen response parameter in kg * ha-1 * yr -1
+//	 * @param gAvNOpt (not currently used) value after which nitrogen is no longer limiting
+//	 * @return
+//	 */
+//	public static double forClimAdjustedMaxHeight(
+//			double mDD, double mDr, 
+//			double kDDMin, double kDDRedRange, //TODO make this a parameter 
+//			double kDrTol,
+//			double kRedMax, double kHMaxIn)
+//	//			double uAvN, double kN2, double gAvNOpt) /* these are commented out in the C# code. */
+//	{
+//		/* lowest possible value for overall reduction percent*/
+//		double minHmaxPct = 100d - kRedMax;
+//
+//		/* Reduction caused by drought */
+//		double gRedFacDI = 100d - mDr * minHmaxPct / kDrTol;
+//		gRedFacDI = Math.max(gRedFacDI,  kRedMax);
+//
+//		//		/* Reduction caused by nitrogen content. 
+//		//		 * This is commented out in the C# code!*/
+//		//		double gRedFacAvN = 100d - (gAvNOpt - uAvN) * minHmaxPct / (gAvNOpt - kN2);
+//		//		gRedFacAvN = Math.min(Math.max(gRedFacAvN, 100d), kRedMax);
+//
+//		/* Reduction caused by degree days. */
+//		double gRedFacDD = 100d;
+//		/* Value after which degree days are no longer limiting. */
+//		double gDDOpt = kDDMin + kDDRedRange;
+//		if(kDDMin < gDDOpt){
+//			gRedFacDD = 100d - (gDDOpt - mDD) * minHmaxPct / (gDDOpt - kDDMin);
+//		} //TODO verify in C# source
+//
+//		/* Final reduction is the lowest of the component reductions. */
+//		//		double finalRedFac = Math.min(gRedFacDI, Math.min(gRedFacAvN, gRedFacDD));
+//		double finalRedFac = Math.min(gRedFacDD, gRedFacDI) / 100d;
+//		return kHMaxIn * finalRedFac;
+//	} //TODO verify in C# source
+//
+//	/** ForClim v.3.0 equation 4.19
+//	 *  Equations 4.20 to 4.26 are implemented within this method.
+//	 * @param unif a uniform random number generator
+//	 * @param kEstP rate of seedling establishment (0 - 1) to account for other factors (pathogens, etc.)
+//	 * @param kDrTol species-specific drought tolerance
+//	 * @param uDr this season's drought index
+//	 * @param kWiTX winter low temp maximum threshold
+//	 * @param uWiT observed winter minimum temperature
+//	 * @param kWiTN winter low temp minimum threshold 
+//	 * @param kDDMin species-specific minimum degree day requirement
+//	 * @param uDD observed sum of degree days during growing season
+//	 * @param kLy sapling shade tolerance
+//	 * @param uAL0 light availability on the forest floor
+//	 * @param kBrPr browsing pressure
+//	 * @param aKbrow exponent for levels of browsing sensitivity
+//	 * @return the probability that any seedlings of the species establish this year
+//	 */
+//	public static double forClimProbabilityEstablishment(
+//			Uniform unif, double kEstP, double kDrTol, 
+//			double uDr, double kWiTx, double uWiT, double kWiTN, 
+//			double kDDMin, double uDD, double kLy, double uAL0, 
+//			double kBrPr)
+//	{
+//
+//		double out = 0d;
+//
+//		/* Soil moisture establishment flag */
+//		if(kDrTol > uDr){
+//			/* Winter temperature establishment flag */
+//			if(kWiTx > uWiT & uWiT > kWiTN){
+//				/* Degree days flag */
+//				if(kDDMin < uDD){
+//					/* Light availablilty flag. */
+//					if(kLy < uAL0){
+//						/* Browsing probability flag */
+//						if(unif.nextDouble() > kBrPr){
+//							out = kEstP;
+//						} 
+//					}}}}
+//
+//		//TODO implement immigration flag?
+//		return out;
+//	} //TODO verify in C# source
+//
+//	/** ForClim v 3.0 equation 4.27
+//	 * 
+//	 * @param kEstDens maximum sapling establishment rate
+//	 * @param kPatchSize size of the forest patch in hectares
+//	 * @param kLa species-specific shade tolerance
+//	 * @return
+//	 */
+//	public static int forClimMaximumSaplingEstablishmentRate(double kEstDens, double kPatchSize, double kLa){
+//		return (int)(0.5 + kEstDens * (kPatchSize * 1E4) * kLa); // Remember that patch size is in hectares!
+//	} //TODO verify in C# source
+//
+//	/** ForClim v.3.0 equation 4.29
+//	 * @param kDeathP mortality probability coefficient
+//	 * @param kAm species-specific maximum tree age
+//	 * @return
+//	 */
+//	public static double forClimBackgroundMortalityPct(double kDeathP, double kAm){
+//		return kDeathP / kAm;
+//	} //TODO verify in C# source
+//
+//
+//
+//	/** ForClim v.3.0 equation 4.31: Increment the counter of slow growth years.
+//	 * @param sGrC number of years a cohort has grown slowly
+//	 * @param growthReductionFactor the calculated growth reduction factor from the grow() method
+//	 * @param kMinRelInc minimum threshold percentage of the ideal diameter growth increment below which growth is considered slow
+//	 * @param dbhIncrement the cohort's trees' most recent dbh increment in cm
+//	 * @param kMinAbsInc the minimum threshold of annual radial growth below which growth is considered slow
+//	 * @return incremented counter if growth is slow, 0 otherwise	 */
+//	public static int forClimSlowGrowthIncrementer(int sGrC, double growthReductionFactor, double kMinRelInc, double dbhIncrement, double kMinAbsInc){
+//		if(growthReductionFactor < kMinRelInc | dbhIncrement < kMinAbsInc) return sGrC +1;
+//		else return 0;
+//
+//	} //TODO verify in C# source
+//
+//
+//
 
 
 
