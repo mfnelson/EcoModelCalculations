@@ -633,6 +633,39 @@ public class PlantCalculator {
 	 */
 	public static double initialSkininess(double kSMin, double kE1){return kSMin + 0.75 * kE1;}
 
+	
+	/** Calculate the probability that new trees of this species 
+	 *  establish  new saplings. <br>
+	 *  
+	 *  Species.cs method Establishment() lines 291 - 321
+	 * @param kWiTN Minimum winter temperature threshold Species.cs
+	 * @param uWiT Maximum winter temperature observed Plant.cs
+	 * @param kWiTX Maximum winter temperature tolerated for regeneration Species.cs
+	 * @param gAL0 Light availability at forest floor Plant.cs
+	 * @param kLy Light requirement of tree saplings Species.cs
+	 * @param kBrP Browsing probability Species.cs
+	 * @param kDDMin Minimal annual degree-day sum Species.cs
+	 * @param uDrSe seasonal drought index Plant.cs
+	 * @param uDrAn annual drought index Plant.cs
+	 * @param uDDSe seasonal degree days Plant.cs
+	 * @param uDDAn annual degree days Plant.cs
+	 * @param isDeciduous Is the tree deciduous or evergreen? Species.cs
+	 * @param kDrTol drought tolerance parameter Species.cs
+	 * @param kEstP Establishment probability coefficient Plant.cs
+	 * @param uniRand Uniform random number generator Plant.cs
+	 * @return
+	 */
+	public static double establishmentProbability(
+			double kWiTN, double uWiT, double kWiTX,
+			double gAL0, double kLy, double kBrP, double kDDMin,
+			double uDrSe, double uDrAn, double uDDSe, double uDDAn, 
+			boolean isDeciduous,
+			double kDrTol, double kEstP, Uniform uniRand)
+	{
+		return establishmentProbability(kWiTN, uWiT, kWiTX, gAL0, kLy, kBrP, kDDMin, 0, 1, uDrSe, uDrAn, uDDSe, uDDAn, isDeciduous, kDrTol, kEstP, uniRand);
+	}
+	
+	
 	/** Calculate the probability that new trees of this species 
 	 *  establish  new saplings. <br>
 	 *  
@@ -715,10 +748,10 @@ public class PlantCalculator {
 	 * @param kN1 Nitrogen response function parameter Species.cs
 	 * @param uAvN Nitrogen availability Plant.cs
 	 * @param kN2 Nitrogen response function parameter Species.cs
-	 * @return growth reduction factor (percent)
+	 * @return species-specific slow growth reduction factor (percent)
 	 */
 	public static double speciesGrowthReductionFactor(
-			double gDD, double gDr, double algf,
+			double gDD, double gDr,
 			double kDDMin, double kDDSl, double kDrTol, 
 			double kN1, double uAvN, double kN2)
 	{
