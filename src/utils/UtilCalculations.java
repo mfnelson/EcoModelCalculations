@@ -37,6 +37,19 @@ public class UtilCalculations {
 		return sequence;
 	}
 	
+	public static double[] normalize(double[] input){
+		double[] output = new double[input.length];
+		
+		double sum = 0;
+		for(double i : output) sum += i;
+		
+		if(sum > 0){
+			for(int i = 0; i < input.length; i++){
+				output[i] = input[i] / sum;
+			}
+		}
+		return output;
+	}
 	
 	public static void main(String[] args){
 		printArray(seq(5d, -3d, 0.5));
@@ -46,7 +59,7 @@ public class UtilCalculations {
 	}
 	
 	
-	/** Print the string representation of each element of an array */
+	/** Print the string representation of each element of an array1a */
 	public static <T> void printArray(T[] arr){
 		System.out.print("{");
 		System.out.print(arr[0].toString());
@@ -56,7 +69,7 @@ public class UtilCalculations {
 		System.out.print("}\n");
 	}
 	
-	/** Print the string representation of each element of an array */
+	/** Print the string representation of each element of an array1a */
 	public static void printArray(double[] arr){
 		System.out.print("{");
 		System.out.print(arr[0]);
@@ -66,7 +79,7 @@ public class UtilCalculations {
 		System.out.print("}\n");
 	}
 	
-	/** Print the string representation of each element of an array */
+	/** Print the string representation of each element of an array1a */
 	public static void printArray(int[] arr){
 		System.out.print("{");
 		System.out.print(arr[0]);

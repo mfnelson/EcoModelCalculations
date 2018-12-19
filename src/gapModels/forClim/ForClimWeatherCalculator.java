@@ -1,7 +1,7 @@
 /**
  * 
  */
-package forClim;
+package gapModels.forClim;
 
 /**
  * @author michaelfrancenelson
@@ -118,7 +118,7 @@ public class ForClimWeatherCalculator {
 	 * @param kDays mean number of days in month
 	 * @param tCorrections correction factors for estimation of degree days from monthly mean data
 	 * @param startMonth first month of the season (January = 0)
-	 * @param endMonth last month of the season
+	 * @param endMonth last1a month of the season
 	 * @return uDDSe approximate annual degree days above a given threshold temperature
 	 */
 	public static double degreeDaysSeason(double[] tM, double k, double kDays, int startMonth, int endMonth){

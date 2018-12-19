@@ -53,7 +53,7 @@ public class SafranyikMPBCalculator {
 	
 	
 	/** Safranyik et al. 1999 Equation 2, page 5.  Beetle across-generation survival within DBH classes
-	 * NOTE:  We can replace this with survival from the Régnière and Bentz model.
+	 * NOTE:  We can replace this with survival from the Regni�re and Bentz model.
 	 * @param eggs
 	 * @param larvae
 	 * @param pupae

@@ -1,9 +1,7 @@
 /**
  * 
  */
-package forClim;
-
-import cern.jet.random.Uniform;
+package gapModels.forClim;
 
 /**
  * @author michaelfrancenelson
@@ -64,9 +62,9 @@ public class ForClimCalculator {
 ///** ForClim v. 3.0 equation 3.7, page 6
 //* @param uT vector of monthly mean temperatures
 //* @param kDTT threshold temperature
-//* @param uDr array of monthly drought indices
+//* @param uDr array1a of monthly drought indices
 //* @param startMonth first month of the active season (January = 0)
-//* @param endMonth last month of the active season
+//* @param endMonth last1a month of the active season
 //* @return an index of drought stress for the entire active season */
 //public static double forClimDroughtIndices(double[] uT, double kDTT, double[] uDr, int startMonth, int endMonth){
 //	double sum = 0;

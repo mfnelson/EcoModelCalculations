@@ -1,7 +1,7 @@
 /**
  * 
  */
-package forClim;
+package gapModels.forClim;
 
 /** A collection of calculations relating to the water submodel of ForClim. <br>
  *  Equations are mostly adaptations of calculations in the Water.cs source
@@ -60,7 +60,7 @@ public class ForClimWaterCalculator {
 	 * @param kDTT the base temperature, above which degree days start to accumulate
 	 * @param uDr monthly drought indices
 	 * @param startMonth first month of the active season (January = 0).
-	 * @param endMonth last month of the active season (December = 11).
+	 * @param endMonth last1a month of the active season (December = 11).
 	 * @return uDr yearly drought index between 0 and 1
 	 */
 	public static double droughtIndex(double[] uT, double kDTT, double[] uDr, int startMonth, int endMonth){
@@ -81,7 +81,7 @@ public class ForClimWaterCalculator {
 	 * 
 	 * @param uAET vector of monthly actual evapotranspiration values
 	 * @param startMonth first month of the active season (January = 0).
-	 * @param endMonth last month of the active season (December = 11).
+	 * @param endMonth last1a month of the active season (December = 11).
 	 * @return  uAET yearly sum of actual evapotranspiration
 	 */
 	public static double actualEvapotranspiration(double[] uAET, int startMonth, int endMonth){

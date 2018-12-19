@@ -1,7 +1,7 @@
 /**
  * 
  */
-package forClim;
+package gapModels.forClim;
 
 import cern.jet.random.Uniform;
 
@@ -9,7 +9,7 @@ import cern.jet.random.Uniform;
  * @author michaelfrancenelson
  *
  */
-public class PlantCalculator {
+public class ForClimPlantCalculator {
 
 
 
@@ -222,7 +222,8 @@ public class PlantCalculator {
 	 * @param kSlowGrP mortality probability for slow growing tree
 	 * @return
 	 */
-	public static double stressInducedMortalityRate(int sGr, int kSlowGrowThreshold, double kSlowGrowMortProb){
+	public static double stressInducedMortalityRate(
+			int sGr, int kSlowGrowThreshold, double kSlowGrowMortProb){
 		if(sGr > kSlowGrowThreshold) return kSlowGrowMortProb;
 		else return 0d;
 	} 
@@ -473,7 +474,7 @@ public class PlantCalculator {
 			double kA2,	double kRSR, double kAshFree)
 	{
 		double foliageTotalDryWeightPerTree = foliageWeight(dbh, kC1, gA1, kA2);
-		double foliageOrganicWeightPerTree = foliageTotalDryWeightPerTree * kAshFree;
+//		double foliageOrganicWeightPerTree = foliageTotalDryWeightPerTree * kAshFree;
 		return kRSR * foliageTotalDryWeightPerTree;
 	}
 
@@ -549,6 +550,7 @@ public class PlantCalculator {
 	 */
 	public static double lightAvailablilty(double gLAI, double kLAtt){
 		return Math.exp(-kLAtt * gLAI);
+		
 	}
 
 
@@ -859,11 +861,11 @@ public class PlantCalculator {
 		double mDr; // = CaseOf(isDeciduous, mDrSe, mDrAn);		
 		/* value after which degree days are no longer limiting */
 		if(isDeciduous){mDD = mDDSe; mDr = mDrSe;} else{mDD = mDDAn; mDr = mDrAn; }
-		double gDDOpt = PlantCalculator.maxLimitingDegreeDays(isDeciduous, mDD);
+		double gDDOpt = ForClimPlantCalculator.maxLimitingDegreeDays(isDeciduous, mDD);
 		/* Reduction caused by drought */
-		gRedFacDI = PlantCalculator.speciesDroughtGrowthReduction(mDr, kDrTol, kRedMax);
+		gRedFacDI = ForClimPlantCalculator.speciesDroughtGrowthReduction(mDr, kDrTol, kRedMax);
 		/* Reduction caused by available degree days */
-		gRedFacDD = PlantCalculator.maxHeightDegreeDayGrowthReductionFactor(gDDOpt, mDD, kRedMax, kDDMin);
+		gRedFacDD = ForClimPlantCalculator.maxHeightDegreeDayGrowthReductionFactor(gDDOpt, mDD, kRedMax, kDDMin);
 
 		//Reduction caused by drought
 		gRedFacDI = speciesDroughtGrowthReduction(mDr, kDrTol, kRedMax);
@@ -920,14 +922,14 @@ public class PlantCalculator {
 //		return gFolAreaAbove / kPatchSize;
 //	} //TODO verify in C# source May be duplicate of method above
 //
-//	//	/** ForClim v.3.0 equation 4.6
-//	//	 * @param kLatt light attenuation coefficient
-//	//	 * @param gLAIh cumulative leaf area index above cohort
-//	//	 * @return
-//	//	 */
-//	//	public static double forClimAvailableLight(double kLatt, double gLAIh){
-//	//		return Math.exp(-kLatt * gLAIh);
-//	//	} //TODO verify in C# source
+		/** ForClim v.3.0 equation 4.6
+		 * @param kLatt light attenuation coefficient
+		 * @param gLAIh cumulative leaf area index above cohort
+		 * @return
+		 */
+		public static double forClimAvailableLight(double kLatt, double gLAIh){
+			return Math.exp(-kLatt * gLAIh);
+		} //TODO verify in C# source
 //
 //	/** ForClim v.3.0 equation 4.7
 //	 * 

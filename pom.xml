@@ -1,0 +1,75 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>EcoModelCalculations</groupId>
+	<artifactId>EcoModelCalculations</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.6</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-rng-core -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-rng-core</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-rng-sampling -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-rng-sampling</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-rng-simple -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-rng-simple</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<!-- Don't add other log4j or slf4j dependencies -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>2.11.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/colt/colt -->
+		<!-- <dependency> -->
+		<!-- <groupId>colt</groupId> -->
+		<!-- <artifactId>colt</artifactId> -->
+		<!-- <version>1.2.0</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.logging.log4j</groupId> -->
+		<!-- <artifactId>log4j-api</artifactId> -->
+		<!-- <version>2.10.0</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.apache.logging.log4j</groupId> -->
+		<!-- <artifactId>log4j-core</artifactId> -->
+		<!-- <version>2.10.0</version> -->
+		<!-- </dependency> -->
+	</dependencies>
+	<repositories>
+		<!-- <repository> -->
+		<!-- <id>michaelfrancenelson_github</id> -->
+		<!-- <url>https://github.com/michaelfrancenelson/MikeUtilsJava/raw/repository/</url> -->
+		<!-- </repository> -->
+	</repositories>
+</project>
