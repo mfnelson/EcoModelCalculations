@@ -3,7 +3,7 @@
  */
 package gapModels.forClim;
 
-import cern.jet.random.Uniform;
+import org.apache.commons.rng.UniformRandomProvider;
 
 /**
  * @author michaelfrancenelson
@@ -662,7 +662,7 @@ public class ForClimPlantCalculator {
 			double gAL0, double kLy, double kBrP, double kDDMin,
 			double uDrSe, double uDrAn, double uDDSe, double uDDAn, 
 			boolean isDeciduous,
-			double kDrTol, double kEstP, Uniform uniRand)
+			double kDrTol, double kEstP, UniformRandomProvider uniRand)
 	{
 		return establishmentProbability(kWiTN, uWiT, kWiTX, gAL0, kLy, kBrP, kDDMin, 0, 1, uDrSe, uDrAn, uDDSe, uDDAn, isDeciduous, kDrTol, kEstP, uniRand);
 	}
@@ -697,7 +697,7 @@ public class ForClimPlantCalculator {
 			double kImmT, double time, 
 			double uDrSe, double uDrAn, double uDDSe, double uDDAn, 
 			boolean isDeciduous,
-			double kDrTol, double kEstP, Uniform uniRand)
+			double kDrTol, double kEstP, UniformRandomProvider uniRand)
 	{
 
 		double gDr = uDrAn;

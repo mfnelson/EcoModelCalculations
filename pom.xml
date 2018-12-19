@@ -5,6 +5,10 @@
 	<groupId>EcoModelCalculations</groupId>
 	<artifactId>EcoModelCalculations</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<properties>
+		<apache.commons.rng.version>1.2</apache.commons.rng.version>
+		<slf4j.version>2.11.0</slf4j.version>
+	</properties>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
@@ -19,52 +23,30 @@
 		</plugins>
 	</build>
 	<dependencies>
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
+		<!-- Don't add other log4j or slf4j dependencies -->
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math3</artifactId>
-			<version>3.6</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-rng-core -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-rng-core</artifactId>
-			<version>1.1</version>
+			<version>${apache.commons.rng.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-rng-sampling -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-rng-sampling</artifactId>
-			<version>1.1</version>
+			<version>${apache.commons.rng.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-rng-simple -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-rng-simple</artifactId>
-			<version>1.1</version>
+			<version>${apache.commons.rng.version}</version>
 		</dependency>
-		<!-- Don't add other log4j or slf4j dependencies -->
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-slf4j-impl</artifactId>
-			<version>2.11.0</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/colt/colt -->
-		<!-- <dependency> -->
-		<!-- <groupId>colt</groupId> -->
-		<!-- <artifactId>colt</artifactId> -->
-		<!-- <version>1.2.0</version> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.apache.logging.log4j</groupId> -->
-		<!-- <artifactId>log4j-api</artifactId> -->
-		<!-- <version>2.10.0</version> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.apache.logging.log4j</groupId> -->
-		<!-- <artifactId>log4j-core</artifactId> -->
-		<!-- <version>2.10.0</version> -->
-		<!-- </dependency> -->
 	</dependencies>
 	<repositories>
 		<!-- <repository> -->

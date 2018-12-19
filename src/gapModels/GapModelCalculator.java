@@ -18,15 +18,8 @@ package gapModels;
  *
  */
 public class GapModelCalculator {
-
 	
-	
-	
-	
-	
-	private static double basalAreaConstant = Math.PI * 1E-4;
-
-
+	private static double BASAL_AREA_CONSTANT_PI = Math.PI * 1E-4;
 	
 	/** The equation used in the fortran code to increment the stand biomass.
 	 * 
@@ -35,11 +28,7 @@ public class GapModelCalculator {
 	 * @param biomassParamB value in fortran code: 2.393
 	 * @return biomass of a tree
 	 */
-	public static double foretStandBiomassFortran(double dbh, double biomassParamA, double biomassParamB)
-	{
-		return biomassParamA * Math.pow(dbh, biomassParamB);
-	}
-	
+	public static double foretStandBiomassFortran(double dbh, double biomassParamA, double biomassParamB) {	return biomassParamA * Math.pow(dbh, biomassParamB); }
 	
 	/** An intermediate in the growth increment calculations in the fortran code. 
 	 * TODO: I know I've seen this equation elsewhere, need to find the reference for it...*/
@@ -49,10 +38,6 @@ public class GapModelCalculator {
 		double term1 = b1 + 0.25 * b2 * b2 / b3;
 		double term2 = 0.5 * b2 / b3;
 		return term1 * term2;
-//				
-//		double quot = 1.0 / b3;
-//		double gr = (b1_centimeters + 0.25 * Math.pow(b2, 2.0) / b3) * (0.5 * b2 / b3); 
-//		return gr;
 	}
 	
 	/** TODO: I know I've seen this equation elsewhere, need to find the reference for it...*/
@@ -82,11 +67,7 @@ public class GapModelCalculator {
 	 * @param dbh
 	 * @return height (in meters?)
 	 */
-	public static double foretHeightFortran(double b2, double b3, double dbh)
-	{
-		return dbh * (b2 - b3 * dbh) / 100.0 + 1.0;
-	}
-	
+	public static double foretHeightFortran(double b2, double b3, double dbh) { return dbh * (b2 - b3 * dbh) / 100.0 + 1.0; }
 	
 	/**  TODO equation from sollins et al 1973 as referenced for table 1 in Shugart and west 1977
 	 * 
@@ -95,10 +76,7 @@ public class GapModelCalculator {
 	 * @param dbh
 	 * @return
 	 */
-	public static double allometricTreeBiomassSollins(double intercept, double slope, double dbh){
-		return intercept + slope * dbh;
-	}
-	
+	public static double allometricTreeBiomassSollins(double intercept, double slope, double dbh){ return intercept + slope * dbh; }
 	
 	/** Allometric parabolic height<br>
 	 * <br> Botkin et al 1972 equation 2
@@ -109,10 +87,7 @@ public class GapModelCalculator {
 	 * @param b3 estimated parameter
 	 * @param dbh current diameter of the individual tree in centimeters.
 	 * @return estimated height in meters	 */
-	public static double allometricPolynomialHeight(double b1, double b2, double b3, double dbh)
-	{
-		return b1 + dbh * (b2 - b3 * dbh) / 100d;
-	}
+	public static double allometricPolynomialHeight(double b1, double b2, double b3, double dbh) { return b1 + dbh * (b2 - b3 * dbh) / 100d; }
 
 	/** Prentice and Leemans 1990 (FORSKA) Equation 4 - allometric asymptotic height from dbh. <br>
 	 * Leemans and Prentice 1987<br>Prentice and Leemans 1990<br>Meyer 1940<br>
@@ -128,9 +103,7 @@ public class GapModelCalculator {
 	}
 	
 	/** TODO write description */
-	public static double logisticShadingInhibition(double slope, double midpoint, double basalArea){
-		return 1d / (1d + Math.exp(-slope * (basalArea - midpoint)));
-	}
+	public static double logisticShadingInhibition(double slope, double midpoint, double basalArea){ return 1d / (1d + Math.exp(-slope * (basalArea - midpoint))); }
 
 	/** Botkin et al. 1972 (JaBoWa) Equation 5: allometric maximum dbh increment <br><br>
 	 * NOTE:  Units are critical here because the parameters b2, and b3 are scaled
@@ -217,24 +190,20 @@ public class GapModelCalculator {
 	{
 //		double sqCmPerSqM = 10000.0;
 //		double sqMperSqCm = 1E-4;
-		return basalAreaConstant * Math.pow(dbh_cm * 0.5, 2d);
+		return BASAL_AREA_CONSTANT_PI * Math.pow(dbh_cm * 0.5, 2d);
 	}
 	
 	/** The yearly mortality rate required for a given percentage of trees to survive a specified number of years.
 	 *  <br> Botkin et al. 1972 (JaBoWa) Equation 12a 
 	 * @param survivalPercent What percentage of trees should survive during the period?
 	 * @param survivalPeriodLength How long is the interval for which annual mortality is calculated. */
-	public static double yearlyExponentialSurvivalRate(double survivalPercent, int survivalPeriodLength){
-		return Math.exp(Math.log(survivalPercent) / survivalPeriodLength);
-	}
+		public static double yearlyExponentialSurvivalRate(double survivalPercent, int survivalPeriodLength){ return Math.exp(Math.log(survivalPercent) / survivalPeriodLength); }
 
 	/** The yearly survival rate required for a given percentage of trees to survive a specified number of years.
 	 *  <br> Botkin et al. 1972 (JaBoWa) Equation 12a 
 	 * @param survivalPercent What percentage of trees should survive during the period?
 	 * @param survivalPeriodLength How long is the interval for which annual mortality is calculated. */
-	public static double yearlyExponentialMortalityRate(double survivalPercent, int survivalPeriodLength){
-		return 1.0 - yearlyExponentialSurvivalRate(survivalPercent, survivalPeriodLength);
-	}
+	public static double yearlyExponentialMortalityRate(double survivalPercent, int survivalPeriodLength){ return 1.0 - yearlyExponentialSurvivalRate(survivalPercent, survivalPeriodLength); }
 
 	/** Botkin et al. 1972 (JaBoWa) Equation 3a: Allometric parameter b2 for calculation of height from dbh. <br><br>
 	 * NOTE:  the choice of units here is critical: centimeters for max dbh and meters for max height.
@@ -242,11 +211,7 @@ public class GapModelCalculator {
 	 * @param heightMax maximum possible height for the tree species in meters
 	 * @param dbhMax maximum possible dbh for the species in cm
 	 * @return b2 */
-	public static double allometricHeightParameterB2(
-			double b1, double heightMax, double dbhMax)
-	{
-		return 200.0 * (heightMax - b1) / dbhMax;
-	}
+	public static double allometricHeightParameterB2(double b1, double heightMax, double dbhMax) { return 200.0 * (heightMax - b1) / dbhMax; }
 
 	/** Botkin et al. 1972 (JaBoWa) Equation 3b: allometric parameter b3 for calculation of height from dbh. <br><br>
 	 * NOTE:  the choice of units here is critical: centimeters for max dbh and meters for max height.
@@ -254,10 +219,7 @@ public class GapModelCalculator {
 	 * @param heightMax maximum possible height for the tree species in meters
 	 * @param dbhMax maximum possible dbh for the species in cm
 	 * @return b3 */
-	public static double allometricHeightParameterB3(
-			double b1, double heightMax, double dbhMax){
-		return 100.0 * (heightMax - b1) / Math.pow(dbhMax, 2.0);
-	}
+	public static double allometricHeightParameterB3(double b1, double heightMax, double dbhMax){return 100.0 * (heightMax - b1) / Math.pow(dbhMax, 2.0); }
 	
 	/** Botkin et al. 1972 (JaBoWa) Equation 8: light response curve<br><br>
 	 * c1 &times (1 - e<sup>-c2 &times (AL - c3)</sup>) <br>
