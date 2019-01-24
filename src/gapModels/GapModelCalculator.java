@@ -18,9 +18,12 @@ package gapModels;
  *
  */
 public class GapModelCalculator {
-	
-	private static double BASAL_AREA_CONSTANT_PI = Math.PI * 1E-4;
-	
+
+	public static double BASAL_AREA_CONSTANT_PI = Math.PI * 1E-4;
+	public static double CELSIUS_TO_FAHRENHEIT_FACTOR = 9.0 / 5.0;
+	public static double FAHRENHEIT_TO_CELSIUS_FACTOR = 5.0 / 9.0;
+
+
 	/** The equation used in the fortran code to increment the stand biomass.
 	 * 
 	 * @param dbh the tree's dbh.
@@ -29,7 +32,7 @@ public class GapModelCalculator {
 	 * @return biomass of a tree
 	 */
 	public static double foretStandBiomassFortran(double dbh, double biomassParamA, double biomassParamB) {	return biomassParamA * Math.pow(dbh, biomassParamB); }
-	
+
 	/** An intermediate in the growth increment calculations in the fortran code. 
 	 * TODO: I know I've seen this equation elsewhere, need to find the reference for it...*/
 	public static double foretFortranGR(double b1_centimeters, double b2, double b3)
@@ -39,7 +42,7 @@ public class GapModelCalculator {
 		double term2 = 0.5 * b2 / b3;
 		return term1 * term2;
 	}
-	
+
 	/** TODO: I know I've seen this equation elsewhere, need to find the reference for it...*/
 	public static double foretFortranSizePenalty(double b1_centimeters, double dbh, double b2, double b3, double gr)
 	{
@@ -52,14 +55,14 @@ public class GapModelCalculator {
 		double denominator = 2 * b1 + 3.0 * dbhB2 - 4.0 * dbhSqB3;
 		return 1.0 - numerator / denominator;
 	}
-	
+
 	public static double foretFortranMaxDBHIncrement(double g, double dbh, double b1_centimeters, double b2, double b3)
 	{
 		return g * dbh * foretFortranSizePenalty(
 				b1_centimeters, dbh, b2, b3, 
 				foretFortranGR(b1_centimeters, b2, b3));
 	}
-	
+
 	/** Formula form the fortran code. <br>
 	 * TODO: 
 	 * @param b2
@@ -68,7 +71,7 @@ public class GapModelCalculator {
 	 * @return height (in meters?)
 	 */
 	public static double foretHeightFortran(double b2, double b3, double dbh) { return dbh * (b2 - b3 * dbh) / 100.0 + 1.0; }
-	
+
 	/**  TODO equation from sollins et al 1973 as referenced for table 1 in Shugart and west 1977
 	 * 
 	 * @param intercept
@@ -77,7 +80,7 @@ public class GapModelCalculator {
 	 * @return
 	 */
 	public static double allometricTreeBiomassSollins(double intercept, double slope, double dbh){ return intercept + slope * dbh; }
-	
+
 	/** Allometric parabolic height<br>
 	 * <br> Botkin et al 1972 equation 2
 	 * <br> Kerr and Smith 1955<br>
@@ -101,14 +104,14 @@ public class GapModelCalculator {
 		double adjHeight = maxHeight - b1;
 		return b1 + (adjHeight) * (1d - Math.exp(-shape * dbh / adjHeight));
 	}
-	
+
 	/** TODO write description */
 	public static double logisticShadingInhibition(double slope, double midpoint, double basalArea){ return 1d / (1d + Math.exp(-slope * (basalArea - midpoint))); }
 
 	/** Botkin et al. 1972 (JaBoWa) Equation 5: allometric maximum dbh increment <br><br>
 	 * NOTE:  Units are critical here because the parameters b2, and b3 are scaled
 	 * so that dbh and dbhMax are given in centimeters while height and heightMax are in meters.<br>
-	 * 
+	 * NOTE: Instead of 20 * b1, the paper had a precalculated term of 270 in the denominator.
 	 * @param g species-specific growth parameter
 	 * @param dbh current tree diameter at breast height in cm
 	 * @param dbhMax maximum possible dbh for the tree species in cm
@@ -125,11 +128,12 @@ public class GapModelCalculator {
 			double b1_meters, double b2, double b3)
 	{
 		return  (g * dbh) * 
-				(1d - (dbh * height) / (dbhMax * heightMax)) /
-				(20 * b1_meters + 3d * b2 * dbh - 4d * b3 * Math.pow(dbh, 2d));
+				(1.0 - (dbh * height) / (dbhMax * heightMax)) /
+				(20.0 * b1_meters + 3.0 * b2 * dbh - 4.0 * b3 * Math.pow(dbh, 2.0));
 	}
-	
+
 	/** Moore (1989) Equation 7: 
+	 * 
 	 * 
 	 * @param g species-specific growth parameter
 	 * @param dbh current tree diameter at breast height in cm
@@ -163,17 +167,17 @@ public class GapModelCalculator {
 		double aSq = Math.pow(a, 2.0);
 		double sqrt1 = Math.sqrt(aSq + 4.0 * a);
 		double dSq = Math.pow(dbhMax, 2.0);
-		
+
 		double term1 = 4.0 * heightMax / (double) ageMax;
-		
+
 		double term2 = Math.log(4.0 * dbhMax - 2.0);
-		
+
 		double term3 = aHalf * Math.log( (9.0/4.0 + aHalf) / (4.0 * dSq + 2.0 * a * dbhMax - a));
 		double term4 = (a + aSq / 2.0) / sqrt1; 
-		
+
 		double term5a = 3.0 + a - sqrt1;
 		double term5b = 3.0 + a + sqrt1;
-		
+
 		double term6a = 4.0 * dbhMax + a + sqrt1;
 		double term6b = 4.0 * dbhMax + a - sqrt1;
 
@@ -182,22 +186,20 @@ public class GapModelCalculator {
 
 		return term1 * (term2 + term3 - term4 * Math.log(term5 * term6));
 	}
-	
+
 	/** Approximation of basal area for a tree assuming a circular stem.
 	 * @param dbh_cm diameter at breast height (in cm).
 	 * @return basal area in square meters. */
 	public static double basalArea(double dbh_cm)
 	{
-//		double sqCmPerSqM = 10000.0;
-//		double sqMperSqCm = 1E-4;
 		return BASAL_AREA_CONSTANT_PI * Math.pow(dbh_cm * 0.5, 2d);
 	}
-	
+
 	/** The yearly mortality rate required for a given percentage of trees to survive a specified number of years.
 	 *  <br> Botkin et al. 1972 (JaBoWa) Equation 12a 
 	 * @param survivalPercent What percentage of trees should survive during the period?
 	 * @param survivalPeriodLength How long is the interval for which annual mortality is calculated. */
-		public static double yearlyExponentialSurvivalRate(double survivalPercent, int survivalPeriodLength){ return Math.exp(Math.log(survivalPercent) / survivalPeriodLength); }
+	public static double yearlyExponentialSurvivalRate(double survivalPercent, int survivalPeriodLength){ return Math.exp(Math.log(survivalPercent) / survivalPeriodLength); }
 
 	/** The yearly survival rate required for a given percentage of trees to survive a specified number of years.
 	 *  <br> Botkin et al. 1972 (JaBoWa) Equation 12a 
@@ -220,20 +222,20 @@ public class GapModelCalculator {
 	 * @param dbhMax maximum possible dbh for the species in cm
 	 * @return b3 */
 	public static double allometricHeightParameterB3(double b1, double heightMax, double dbhMax){return 100.0 * (heightMax - b1) / Math.pow(dbhMax, 2.0); }
-	
+
 	/** Botkin et al. 1972 (JaBoWa) Equation 8: light response curve<br><br>
 	 * c1 &times (1 - e<sup>-c2 &times (AL - c3)</sup>) <br>
 	 * NOTE:  The original JaBoWa specification allowed light response to be greater than 1.
 	 * @param availableLight
 	 * @param c1 light response constant 1, originally 1.0 (2.24) for shade tolerant (intolerant) plants
 	 * @param c2 light response constant 2, originally 4.64 (1.136) for shade tolerant (intolerant) plants
-	 * @param c3 light response constant 2, originally 0.05 (0.08) for shade tolerant (intolerant) plants
+	 * @param c3 light response constant 3, originally 0.05 (0.08) for shade tolerant (intolerant) plants
 	 * @return photosynthetic rate	 */
 	public static double exponentialLightResponseCurve(double availableLight, double c1, double c2, double c3){
 		double response = c1 * (1.0 - Math.exp(-c2 * (availableLight - c3)));
 		return Math.max(0d, response);
 	}
-	
+
 	/** Botkin et al. 1972 (JaBoWa) Equation 10: parabolic annual temperature effect on growth.
 	 * @param speciesDegreeDaysMin the minimum degree days required by this species
 	 * @param speciesDegreeDaysMax the maximum degree days tolerated by this species 
@@ -245,7 +247,7 @@ public class GapModelCalculator {
 				(speciesDegreeDaysMax - currentYearDegreeDays) /
 				Math.pow(speciesDegreeDaysMax - speciesDegreeDaysMin, 2.0));
 	}
-	
+
 	/** Leaf area as calculated in Jabowa and FORET <br>
 	 * 
 	 *  Jabowa used k = 45.  Foret used k = 1. <br>
@@ -259,7 +261,45 @@ public class GapModelCalculator {
 	public static double allometricLeafArea(double dbh, double leafAreaParamA, double leafAreaParamB, double k)	{
 		return leafAreaParamA * Math.pow(dbh, leafAreaParamB) / k;
 	}
+
+
+
+	/** From Table 1 in Botkin et al 1972a, footnote i for the leaf-area constant C. <br>
+	 * "Leaf area in (m) = (C * D^2) / 45 (with D in cm)" <br>
+	 * 
+	 * Botkin et alk. 1972 b footnote 6 for table 1 paramater C has: <br>
+	 * "Actual leaf are in square metres is ~(C * D^2) / 15 for D in cm." <br>
+	 * 
+	 * In both of the above, leaf weight is C * D^2
+	 * 
+	 * @param leafWeight in grams
+	 * @param leafAreaIndexParam proportionality constant to convert leaf weight to SLA.  Botkin 1972a used 45, 1972b stated 15
+	 * @return Leaf area in square meters.
+	 */
+	public static double jabowaAllometricLeafArea(double leafWeight, double leafAreaIndexParam)
+	{ return leafWeight / leafAreaIndexParam; }
 	
+
+
+	/** From Botkin et al 1972a page 107, paragraph 3: <br>
+	 * "The summation WEIGHT is based on the moderately
+	 * well documented assumption that for dominant
+	 * trees the total leaf area (and hence WEIGHT) is equal
+	 * to a species constant C(i) times the square of the diameter
+	 * of the tree." <br>
+	 * 
+	 *  NOTE: this can't be used directly in the light response calculation, it must first be converted to 
+	 *  SLA!
+	 * 
+	 * @param leafAreaConstantC (g / cm^2) Species-specific leaf area constant relating the square of dbh to leaf weight
+	 * @param dbh tree's current dbh in cm
+	 * @param leafAreaIndexParamB The exponent used in the leaf weight calculation
+	 * @return A estimate of the total weight in gramss of leaves for a tree
+	 */
+	public static double leafWeightJaBoWa(double leafAreaConstantC, double dbh, double leafAreaIndexParamB)
+	{ return leafAreaConstantC * Math.pow(dbh, leafAreaIndexParamB); }
+
+
 	/** Botkin et al. 1972 (JaBoWa) Equation 11: simple linear crowding growth reduction.  
 	 * @param currentBasalArea is the sum of the basal areas of all trees on the patch.
 	 * @param maxBasalArea is the maximum allowed basal area on the patch.
@@ -273,19 +313,19 @@ public class GapModelCalculator {
 		double x = Math.min(1.0, currentBasalArea / maxBasalArea);
 		return 1 - 1.0 / (1.0 + Math.exp(-steepness * (x - midpoint)));
 	}
-	
-	
+
+
 	/** Botkin et al. 1972 (JaBoWa) Equation 7: The 'disk' model for light availability.<br><br>
 	 * 	Derived from the Beer-Lambert law
 	 *  LA = &phi; &times e<sup>-k &times SLA</sup>
 	 * @param phi annual insolation in appropriate units, 1 by default in original JaBoWa
 	 * @param k tuning parameter, 1/6000 in original JaBoWa
-	 * @param sla the sum of the leaf areas of all trees taller than this one
+	 * @param slaAbove the sum of the leaf areas of all trees taller than this one
 	 * @return an estimate of light available to the tree for photosynthesis. */
-	public static double diskLightAvailability(double phi, double k, double sla){
-		return phi * Math.exp(-k * sla);
+	public static double diskLightAvailability(double phi, double k, double slaAbove){
+		return phi * Math.exp(-k * slaAbove);
 	}
-	
+
 	/** Botkin et al. 1972 (JaBoWa) Equation 9: a site's degree days. <br><br>
 	 * NOTE: The return value is in the same units as the arguments. <br>
 	 * NOTE: All arguments must be in the same units (degrees C or F).
@@ -325,5 +365,15 @@ public class GapModelCalculator {
 	 */
 	public static double jaBoWaLapseTemperature(double baseTemp, double elevationDifference, double lapseRate){
 		return baseTemp - lapseRate * (elevationDifference / 1000.0);
+	}
+
+	/** Convert degrees F to degrees C */
+	public static double fahrenheitToCelsius(double tempF) {
+		return FAHRENHEIT_TO_CELSIUS_FACTOR * (tempF - 32.0);
+	}
+
+	/** Convert degrees C to degrees F */
+	public static double celsiusTofahrenheit(double tempC) {
+		return CELSIUS_TO_FAHRENHEIT_FACTOR * tempC + 32.0;
 	}
 }
