@@ -18,7 +18,7 @@ public class MPBCalculations {
 	public static double[] weightedScore(double[] score, double weight)
 	{
 		/* Normalize the scores: */
-		double[] scores = Sequences.normalize(score, 0d, 1d);
+		double[] scores = Sequences.recenterAndNormalize(score, 0d, 1d);
 		for(int i = 0; i < scores.length; i++)
 			scores[i] = weightedScore(scores[i], weight);
 		
