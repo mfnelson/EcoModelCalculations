@@ -253,7 +253,8 @@ public class GapModelCalculator {
 	 *  Jabowa used k = 45.  Foret used k = 1. <br>
 	 *  Foret used leafAreaParamA = 1.9283295E-4, leafAreaParamB = 2.129. <br>
 	 *  Jabowa used leafAreaParamB = 2.0. <br>
-	 * @param dbh
+	 *  Sollins et al 1973
+
 	 * @param leafAreaParamA  Jabowa called this parameter 'c'.
 	 * @param leafAreaParamB 
 	 * @param k scalar factor to convert leaf weight to projected leaf area. The original JaBoWa model used 45.
